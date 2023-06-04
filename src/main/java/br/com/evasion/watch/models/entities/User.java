@@ -13,17 +13,22 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class User {
 
+	@NotNull
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
+	@NotNull
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
 
+	@NotNull
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private UserRoleEnum userRole;
@@ -32,9 +37,11 @@ public class User {
 	@Column(nullable = false)
 	private String login;
 
+	@NotBlank
 	@Column(nullable = false)
 	private String password;
 
+	@NotBlank
 	@Column(nullable = false)
 	private String name;
 
