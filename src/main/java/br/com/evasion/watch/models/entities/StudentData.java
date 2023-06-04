@@ -29,7 +29,7 @@ public class StudentData {
 	private String name;
 	
 	@NotBlank
-	@Column(nullable = false)
+	@Column(nullable = false, unique = true)
 	private String studentID;
 	
 	@NotNull
