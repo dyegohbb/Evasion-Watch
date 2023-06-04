@@ -5,14 +5,19 @@ import java.time.LocalDateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
+@Table(name = "student_data")
 public class StudentData {
 
 	@NotNull
@@ -36,6 +41,10 @@ public class StudentData {
 	@Column(nullable = false)
 	@Embedded
 	private StudentDataFeatures features;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "csv_import_history_id")
+    private CsvImportHistory csvImportHistory;
 	
 	public StudentData() {
 		// Empty constructor
