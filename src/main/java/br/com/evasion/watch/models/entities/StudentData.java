@@ -2,6 +2,7 @@ package br.com.evasion.watch.models.entities;
 
 import java.time.LocalDateTime;
 
+import br.com.evasion.watch.models.embeddables.StudentDataFeatures;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;

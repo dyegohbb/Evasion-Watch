@@ -1,4 +1,4 @@
-package br.com.evasion.watch.models.entities;
+package br.com.evasion.watch.models.embeddables;
 
 import java.time.LocalDateTime;
 
