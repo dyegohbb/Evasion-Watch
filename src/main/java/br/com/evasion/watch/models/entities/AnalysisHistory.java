@@ -36,6 +36,7 @@ public class AnalysisHistory {
 	
 	@NotNull
 	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
 	private AnalysisTypeEnum type;
 	
 	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -51,6 +52,38 @@ public class AnalysisHistory {
 	@PrePersist
 	protected void onCreate() {
 		this.createdAt = LocalDateTime.now();
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public AnalysisTypeEnum getType() {
+		return type;
+	}
+
+	public void setType(AnalysisTypeEnum type) {
+		this.type = type;
+	}
+
+	public Set<StudentData> getStudentDatas() {
+		return studentDatas;
+	}
+
+	public void setStudentDatas(Set<StudentData> studentDatas) {
+		this.studentDatas = studentDatas;
 	}
 	
 }

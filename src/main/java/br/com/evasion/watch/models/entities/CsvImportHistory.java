@@ -34,8 +34,8 @@ public class CsvImportHistory {
 	private LocalDateTime createdAt;
 	
 	@NotNull
-	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
 	private SituationEnum situation;
 	
 	@NotBlank
