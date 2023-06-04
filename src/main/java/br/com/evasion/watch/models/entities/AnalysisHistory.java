@@ -25,16 +25,14 @@ import jakarta.validation.constraints.NotNull;
 @Table(name="analysis_history")
 public class AnalysisHistory {
 
-	@NotNull
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@NotNull
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
 	
-	@NotNull
+	@NotNull(message = "O tipo de analise não pode ser nulo")
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private AnalysisTypeEnum type;

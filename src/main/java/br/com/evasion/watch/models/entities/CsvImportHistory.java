@@ -25,32 +25,30 @@ import jakarta.validation.constraints.NotNull;
 public class CsvImportHistory {
 
 	@Id
-	@NotNull
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@NotNull
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
 	
-	@NotNull
+	@NotNull(message = "Situação não pode ser nula")
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private SituationEnum situation;
 	
-	@NotBlank
+	@NotBlank(message = "Nome do arquivo não pode ser vazio")
 	@Column(nullable = false)
 	private String fileName;
 	
-	@NotNull
+	@NotNull(message = "Tamanho do arquivo não pode ser nulo")
 	@Column(nullable = false)
 	private double fileSize;
 	
-	@NotNull
+	@NotNull(message = "A quantidade de linhas não pode ser nula")
 	@Column(nullable = false)
 	private int rowCount = 0;
 	
-	@NotNull
+	@NotNull(message = "Os dados dos estudantes não pode ser nulo")
 	@Column(nullable = false)
 	@OneToMany(mappedBy = "csvImportHistory", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Set<StudentData> studentDatas = new HashSet<>();
