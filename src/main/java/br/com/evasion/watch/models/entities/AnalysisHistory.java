@@ -1,43 +1,50 @@
 package br.com.evasion.watch.models.entities;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
-import br.com.evasion.watch.models.embeddables.TrainingMetrics;
-import br.com.evasion.watch.models.enums.SituationEnum;
+import br.com.evasion.watch.models.enums.AnalysisTypeEnum;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embedded;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Table(name="training_history")
-public class TrainingHistory {
+@Table(name="analysis_history")
+public class AnalysisHistory {
 
-	@Id
 	@NotNull
+	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
-	
+
 	@NotNull
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
 	
 	@NotNull
-	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
-	private SituationEnum situation;
+	private AnalysisTypeEnum type;
 	
-	@Embedded
-	private TrainingMetrics metrics;
+	@ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @JoinTable(name = "analysis_student_relation",
+               joinColumns = @JoinColumn(name = "analysis_history_id"),
+               inverseJoinColumns = @JoinColumn(name = "student_data_id"))
+    private Set<StudentData> studentDatas = new HashSet<>();
 	
-	public TrainingHistory() {
+	public AnalysisHistory() {
 		// Empty Constructor
 	}
 
