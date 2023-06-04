@@ -16,7 +16,7 @@ public class TrainingMetrics {
     private int recall;
 	
 	@NotNull
-    private int precision;
+    private int precisionValue;
 	
 	@NotNull
     private int kappa;
@@ -55,12 +55,12 @@ public class TrainingMetrics {
 		this.recall = recall;
 	}
 
-	public int getPrecision() {
-		return precision;
+	public int getPrecisionValue() {
+		return precisionValue;
 	}
 
-	public void setPrecision(int precision) {
-		this.precision = precision;
+	public void setPrecisionValue(int precisionValue) {
+		this.precisionValue = precisionValue;
 	}
 
 	public int getKappa() {

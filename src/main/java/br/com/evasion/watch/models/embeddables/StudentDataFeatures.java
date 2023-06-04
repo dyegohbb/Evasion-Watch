@@ -1,16 +1,10 @@
 package br.com.evasion.watch.models.embeddables;
 
-import java.time.LocalDateTime;
-
 import jakarta.persistence.Embeddable;
-import jakarta.persistence.PrePersist;
 import jakarta.validation.constraints.NotNull;
 
 @Embeddable
 public class StudentDataFeatures {
-	
-	@NotNull
-	private LocalDateTime createdAt;
 	
 	@NotNull
 	private String descricaoModalidadeCurso;
@@ -56,19 +50,6 @@ public class StudentDataFeatures {
 	
 	public StudentDataFeatures() {
 		// Empty constructor
-	}
-	
-	@PrePersist
-	protected void onCreate() {
-		this.createdAt = LocalDateTime.now();
-	}
-
-	public LocalDateTime getCreatedAt() {
-		return createdAt;
-	}
-
-	public void setCreatedAt(LocalDateTime createdAt) {
-		this.createdAt = createdAt;
 	}
 
 	public String getDescricaoModalidadeCurso() {
