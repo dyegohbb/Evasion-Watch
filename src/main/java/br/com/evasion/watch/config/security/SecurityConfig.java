@@ -30,12 +30,15 @@ public class SecurityConfig {
 
 	@Bean
 	public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-		http.csrf().disable().authorizeHttpRequests().requestMatchers("/user/login", "/user/register").permitAll().anyRequest().authenticated()
-				.and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+
+		http.csrf(csrf -> csrf.disable())
+				.authorizeHttpRequests(auth -> auth.requestMatchers("/user/login", "/user/register").permitAll()
+						.anyRequest().authenticated())
+				.sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authenticationProvider(authenticationProvider)
-				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class).logout()
-				.logoutUrl("/api/v1/auth/logout").addLogoutHandler(logoutHandler)
-				.logoutSuccessHandler((request, response, authentication) -> SecurityContextHolder.clearContext());
+				.addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
+				.logout(logout -> logout.logoutUrl("/user/logout").addLogoutHandler(logoutHandler).logoutSuccessHandler(
+						(request, response, authentication) -> SecurityContextHolder.clearContext()));
 
 		return http.build();
 	}
