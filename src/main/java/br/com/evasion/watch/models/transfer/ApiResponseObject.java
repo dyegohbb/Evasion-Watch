@@ -11,7 +11,8 @@ public class ApiResponseObject {
 	private HttpStatus status;
 	
 	public ApiResponseObject() {
-		// Empty constructor
+		this.status = HttpStatus.OK;
+		this.message = "Sucesso.";
 	}
 	
 	public ApiResponseObject(String message, HttpStatus status) {

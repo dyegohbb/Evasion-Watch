@@ -1,8 +1,13 @@
 package br.com.evasion.watch.models.entities;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import br.com.evasion.watch.models.enums.UserRoleEnum;
 import br.com.evasion.watch.validation.LoginValidation;
@@ -20,7 +25,9 @@ import jakarta.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "user")
-public class User {
+public class User implements UserDetails {
+	
+	private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -91,6 +98,7 @@ public class User {
 		this.login = login;
 	}
 
+	@Override
 	public String getPassword() {
 		return password;
 	}
@@ -115,10 +123,40 @@ public class User {
 		this.email = email;
 	}
 
-	public void prepareFields(BCryptPasswordEncoder encoder) {
+	public void prepareFields(PasswordEncoder encoder) {
 		this.email = this.email.toLowerCase();
 		this.login = this.login.toLowerCase();
 		this.password = encoder.encode(this.password);
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return List.of(new SimpleGrantedAuthority(this.userRole.name()));
+	}
+
+	@Override
+	public String getUsername() {
+		return this.login;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 	
 }
