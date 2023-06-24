@@ -21,24 +21,22 @@ import jakarta.validation.constraints.NotNull;
 @Table(name = "student_data")
 public class StudentData {
 
-	@NotNull
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@NotNull
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
 	
-	@NotBlank
+	@NotBlank(message = "Nome deve ser preenchido")
 	@Column(nullable = false)
 	private String name;
 	
-	@NotBlank
+	@NotBlank(message = "Matricula deve ser preenchida")
 	@Column(nullable = false, unique = true)
 	private String studentID;
 	
-	@NotNull
+	@NotNull(message = "Features não pode ser nula")
 	@Column(nullable = false)
 	@Embedded
 	private StudentDataFeatures features;

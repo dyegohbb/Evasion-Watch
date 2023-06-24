@@ -21,15 +21,13 @@ import jakarta.validation.constraints.NotNull;
 public class TrainingHistory {
 
 	@Id
-	@NotNull
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 	
-	@NotNull
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
 	
-	@NotNull
+	@NotNull(message = "A situação do treino não pode ser nula")
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private SituationEnum situation;
@@ -44,6 +42,38 @@ public class TrainingHistory {
 	@PrePersist
 	protected void onCreate() {
 		this.createdAt = LocalDateTime.now();
+	}
+
+	public int getId() {
+		return id;
+	}
+
+	public void setId(int id) {
+		this.id = id;
+	}
+
+	public LocalDateTime getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreatedAt(LocalDateTime createdAt) {
+		this.createdAt = createdAt;
+	}
+
+	public SituationEnum getSituation() {
+		return situation;
+	}
+
+	public void setSituation(SituationEnum situation) {
+		this.situation = situation;
+	}
+
+	public TrainingMetrics getMetrics() {
+		return metrics;
+	}
+
+	public void setMetrics(TrainingMetrics metrics) {
+		this.metrics = metrics;
 	}
 	
 }

@@ -1,6 +1,13 @@
 package br.com.evasion.watch.models.entities;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import br.com.evasion.watch.models.enums.UserRoleEnum;
 import br.com.evasion.watch.validation.LoginValidation;
@@ -15,40 +22,38 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "user")
-public class User {
+public class User implements UserDetails {
+	
+	private static final long serialVersionUID = 1L;
 
-	@NotNull
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@NotNull
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
 
-	@NotNull
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private UserRoleEnum userRole;
 
-	@LoginValidation
-	@Column(nullable = false)
+	@LoginValidation(message = "Login inválido")
+	@Column(nullable = false, unique = true)
 	private String login;
 
-	@NotBlank
+	@NotBlank(message = "A senha deve ser preenchida")
 	@Column(nullable = false)
 	private String password;
 
-	@NotBlank
+	@NotBlank(message = "O nome deve ser preenchido")
 	@Column(nullable = false)
 	private String name;
 
-	@Email
-	@Column(nullable = false)
+	@Email(message = "Email inválido")
+	@Column(nullable = false, unique = true)
 	private String email;
 	
 	public User() {
@@ -93,6 +98,7 @@ public class User {
 		this.login = login;
 	}
 
+	@Override
 	public String getPassword() {
 		return password;
 	}
@@ -115,6 +121,42 @@ public class User {
 
 	public void setEmail(String email) {
 		this.email = email;
+	}
+
+	public void prepareFields(PasswordEncoder encoder) {
+		this.email = this.email.toLowerCase();
+		this.login = this.login.toLowerCase();
+		this.password = encoder.encode(this.password);
+	}
+
+	@Override
+	public Collection<? extends GrantedAuthority> getAuthorities() {
+		return List.of(new SimpleGrantedAuthority(this.userRole.name()));
+	}
+
+	@Override
+	public String getUsername() {
+		return this.login;
+	}
+
+	@Override
+	public boolean isAccountNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isAccountNonLocked() {
+		return true;
+	}
+
+	@Override
+	public boolean isCredentialsNonExpired() {
+		return true;
+	}
+
+	@Override
+	public boolean isEnabled() {
+		return true;
 	}
 	
 }

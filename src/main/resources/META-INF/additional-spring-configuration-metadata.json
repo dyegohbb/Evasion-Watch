@@ -1,0 +1,17 @@
+{"properties": [
+  {
+    "name": "application.security.jwt.secret-key",
+    "type": "java.lang.String",
+    "description": "Chave fixa responsável por gerar o token JWT"
+  },
+  {
+    "name": "application.security.jwt.expiration",
+    "type": "java.lang.String",
+    "description": "Tempo de expiração do token JWT em milisegundos"
+  },
+  {
+    "name": "application.security.jwt.refresh-token.expiration",
+    "type": "java.lang.String",
+    "description": "Tempo de expiração do refresh token JWT em milisegundos"
+  }
+]}

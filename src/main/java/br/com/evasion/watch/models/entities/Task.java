@@ -20,36 +20,34 @@ import jakarta.validation.constraints.NotNull;
 @Table(name = "task")
 public class Task {
 
-	@NotNull
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@NotNull
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
-	
-	@NotNull
+
+	@NotNull(message = "A operação não pode ser nula")
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private TaskOperationEnum operation;
-	
-	@NotBlank
+
+	@NotBlank(message = "O metadata não pode ser vazio")
 	@Column(nullable = false)
-	private String data;
-	
-	@NotNull
+	private String metadata;
+
+	@NotNull(message = "A situação não pode ser nula")
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private SituationEnum situation;
-	
-	@NotNull
+
+	@NotNull(message = "O progresso da tarefa não pode ser nulo")
 	@Column(nullable = false)
 	private int progress = 0;
-	
+
 	@Column(nullable = true)
 	private String exeptionMsg;
-	
+
 	public Task() {
 		// Empty Constructor
 	}
@@ -83,12 +81,12 @@ public class Task {
 		this.operation = operation;
 	}
 
-	public String getData() {
-		return data;
+	public String getMetadata() {
+		return metadata;
 	}
 
-	public void setData(String data) {
-		this.data = data;
+	public void setMetadata(String metadata) {
+		this.metadata = metadata;
 	}
 
 	public SituationEnum getSituation() {
@@ -114,5 +112,5 @@ public class Task {
 	public void setExeptionMsg(String exeptionMsg) {
 		this.exeptionMsg = exeptionMsg;
 	}
-	
+
 }

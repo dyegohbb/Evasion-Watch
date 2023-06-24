@@ -20,24 +20,22 @@ import jakarta.validation.constraints.NotNull;
 @Table(name = "scheduled_analysis")
 public class ScheduledAnalysis {
 
-	@NotNull
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
 
-	@NotNull
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
 	
-	@NotNull
+	@NotNull(message = "Data de inicio não pode ser nula")
 	@Column(nullable = false)
 	private LocalDate startDate;
 	
-	@EndDateValidation(startDate = "startDate")
+	@EndDateValidation(startDate = "startDate", message = "Data final inválida")
 	@Column(nullable = true)
 	private LocalDate endDate;
 	
-	@NotNull
+	@NotNull(message = "Recorrencia não pode ser nula")
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private RecurrenceEnum recurrence;

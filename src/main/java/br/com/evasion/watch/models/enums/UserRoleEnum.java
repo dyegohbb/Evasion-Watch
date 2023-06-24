@@ -2,7 +2,7 @@ package br.com.evasion.watch.models.enums;
 
 public enum UserRoleEnum {
 	
-	BASIC_USER("Usuário comum"),
+	BASIC_USER("Usuário"),
 	ADMIN_USER("Administrador");
 
 	private String description;
