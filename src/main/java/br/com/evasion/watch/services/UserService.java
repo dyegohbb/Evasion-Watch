@@ -18,6 +18,7 @@ import br.com.evasion.watch.config.security.TokenType;
 import br.com.evasion.watch.exceptions.EmailExistsException;
 import br.com.evasion.watch.exceptions.EwException;
 import br.com.evasion.watch.exceptions.LoginExistsException;
+import br.com.evasion.watch.exceptions.UserNotFoundException;
 import br.com.evasion.watch.models.entities.User;
 import br.com.evasion.watch.models.transfer.ApiResponseObject;
 import br.com.evasion.watch.models.transfer.AuthenticationApiResponseObject;
@@ -43,6 +44,10 @@ public class UserService {
 
 	@Autowired
 	private AuthenticationManager authenticationManager;
+	
+	public User findUserByLogin(String login) throws UserNotFoundException {
+		return userRepository.findByLogin(login).orElseThrow(() -> new UserNotFoundException(login));
+	}
 
 	public ApiResponseObject registerUser(User user, BindingResult bindingResult) {
 		LOGGER.info("Iniciando a criação do usuário: {}", user.getLogin());
