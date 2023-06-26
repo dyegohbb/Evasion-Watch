@@ -1,8 +1,8 @@
 package br.com.evasion.watch.models.entities;
 
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 import br.com.evasion.watch.models.enums.SituationEnum;
 import jakarta.persistence.CascadeType;
@@ -51,7 +51,7 @@ public class CsvImportHistory {
 	@NotNull(message = "Os dados dos estudantes não pode ser nulo")
 	@Column(nullable = false)
 	@OneToMany(mappedBy = "csvImportHistory", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private Set<StudentData> studentDatas = new HashSet<>();
+    private List<StudentData> studentDatas = new ArrayList<>();
 	
 	public CsvImportHistory() {
 		// Empty Constructor
@@ -110,11 +110,11 @@ public class CsvImportHistory {
 		this.rowCount = rowCount;
 	}
 
-	public Set<StudentData> getStudentDatas() {
+	public List<StudentData> getStudentDatas() {
 		return studentDatas;
 	}
 
-	public void setStudentDatas(Set<StudentData> studentDatas) {
+	public void setStudentDatas(List<StudentData> studentDatas) {
 		this.studentDatas = studentDatas;
 	}
 	
