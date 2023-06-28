@@ -57,8 +57,14 @@ public class StudentDataService {
 				} else {
 					throw new NoFileContentException();
 				}
+				
+				CsvImportHistory importHistory = new CsvImportHistory();
+				importHistory.setFileName(fileName);
+				importHistory.setFileSize(studentDataCsv.getSize());
+				importHistory.setSituation(SituationEnum.RUNNING);
+				importHistoryRepository.save(importHistory);
 
-				return this.processStudentDataCsv(studentDataCsv, user, fileName);
+				return this.processStudentDataCsv(studentDataCsv, user, fileName, importHistory);
 			}
 			throw new NoFileContentException();
 
@@ -69,7 +75,7 @@ public class StudentDataService {
 
 	}
 
-	private ApiResponseObject processStudentDataCsv(MultipartFile studentDataCsv, User user, String fileName) {
+	private ApiResponseObject processStudentDataCsv(MultipartFile studentDataCsv, User user, String fileName, CsvImportHistory importHistory) {
 		CSVFormat csvFormat = CSVFormat.DEFAULT.builder().setDelimiter(";").setIgnoreEmptyLines(true)
 				.setSkipHeaderRecord(true).setHeader().build();
 		int rowCount = 0;
@@ -81,7 +87,7 @@ public class StudentDataService {
 			List<StudentData> dataList = csvParser.stream().parallel()
 					.map(csvRecord -> this.prepareDatafromCSVRecord(csvRecord, headerMap)).toList();
 
-			rowCount = prepareAndSaveCsvImportHistory(studentDataCsv, fileName, dataList);
+			rowCount = prepareAndSaveCsvImportHistory(studentDataCsv, fileName, dataList, importHistory);
 
 		} catch (EwException e) {
 			LOGGER.error("Erro ao processar dados, motivo: {}", e.getMessage());
@@ -97,19 +103,18 @@ public class StudentDataService {
 	}
 
 	private int prepareAndSaveCsvImportHistory(MultipartFile studentDataCsv, String fileName,
-			List<StudentData> dataList) throws EwException {
+			List<StudentData> dataList, CsvImportHistory importHistory) throws EwException {
 		int rowCount = dataList.size();
 		
 		try {
-			CsvImportHistory importHistory = new CsvImportHistory();
-			importHistory.setFileName(fileName);
-			importHistory.setFileSize(studentDataCsv.getSize());
 			importHistory.setRowCount(rowCount);
-			importHistory.setSituation(SituationEnum.RUNNING);
+			importHistory.setSituation(SituationEnum.SUCCESS);
 			importHistory.setStudentDatas(dataList);
 
 			importHistoryRepository.save(importHistory);
 		} catch (Exception e) {
+			importHistory.setSituation(SituationEnum.ERROR);
+			importHistoryRepository.save(importHistory);
 			throw new EwException(
 					String.format("Erro ao salvar dados no banco de dados, motivo: %s", e.getMessage()),
 					HttpStatus.BAD_REQUEST);
