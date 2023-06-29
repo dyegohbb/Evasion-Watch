@@ -1,4 +1,4 @@
-package br.com.evasion.watch.config.security;
+package br.com.evasion.watch.config.security.service;
 
 import java.security.Key;
 import java.util.Date;
