@@ -1,10 +1,12 @@
-package br.com.evasion.watch.config.security;
+package br.com.evasion.watch.repositories;
 
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+
+import br.com.evasion.watch.models.entities.Token;
 
 public interface TokenRepository extends JpaRepository<Token, Integer> {
 

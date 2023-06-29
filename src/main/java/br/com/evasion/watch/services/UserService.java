@@ -11,18 +11,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.ObjectError;
 
-import br.com.evasion.watch.config.security.JwtService;
-import br.com.evasion.watch.config.security.Token;
-import br.com.evasion.watch.config.security.TokenRepository;
-import br.com.evasion.watch.config.security.TokenType;
+import br.com.evasion.watch.config.security.service.JwtService;
 import br.com.evasion.watch.exceptions.EmailExistsException;
 import br.com.evasion.watch.exceptions.EwException;
 import br.com.evasion.watch.exceptions.LoginExistsException;
 import br.com.evasion.watch.exceptions.UserNotFoundException;
+import br.com.evasion.watch.models.entities.Token;
 import br.com.evasion.watch.models.entities.User;
+import br.com.evasion.watch.models.enums.TokenTypeEnum;
 import br.com.evasion.watch.models.transfer.ApiResponseObject;
 import br.com.evasion.watch.models.transfer.AuthenticationApiResponseObject;
 import br.com.evasion.watch.models.transfer.AuthenticationRequest;
+import br.com.evasion.watch.repositories.TokenRepository;
 import br.com.evasion.watch.repositories.UserRepository;
 
 @Service
@@ -100,7 +100,7 @@ public class UserService {
 	}
 
 	private void saveUserToken(User user, String jwtToken) {
-		Token token = new Token(user, jwtToken, TokenType.BEARER, false, false);
+		Token token = new Token(user, jwtToken, TokenTypeEnum.BEARER, false, false);
 		tokenRepository.save(token);
 	}
 

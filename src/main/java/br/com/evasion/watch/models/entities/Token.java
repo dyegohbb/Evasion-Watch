@@ -1,6 +1,6 @@
-package br.com.evasion.watch.config.security;
+package br.com.evasion.watch.models.entities;
 
-import br.com.evasion.watch.models.entities.User;
+import br.com.evasion.watch.models.enums.TokenTypeEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -22,7 +22,7 @@ public class Token {
 	public String token;
 
 	@Enumerated(EnumType.STRING)
-	public TokenType tokenType = TokenType.BEARER;
+	public TokenTypeEnum tokenType = TokenTypeEnum.BEARER;
 
 	public boolean revoked;
 
@@ -35,7 +35,7 @@ public class Token {
 	public Token() {
 	}
 
-	public Token(User user, String jwtToken, TokenType tokenType, boolean revoked, boolean expired) {
+	public Token(User user, String jwtToken, TokenTypeEnum tokenType, boolean revoked, boolean expired) {
 		this.user = user;
 		this.token = jwtToken;
 		this.tokenType = tokenType;
@@ -59,11 +59,11 @@ public class Token {
 		this.token = token;
 	}
 
-	public TokenType getTokenType() {
+	public TokenTypeEnum getTokenType() {
 		return tokenType;
 	}
 
-	public void setTokenType(TokenType tokenType) {
+	public void setTokenType(TokenTypeEnum tokenType) {
 		this.tokenType = tokenType;
 	}
 
