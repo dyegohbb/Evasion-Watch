@@ -24,6 +24,11 @@ public class ApiResponseObject {
 		this.message = exception.getMessage();
 		this.status = exception.getHttpStatus();
 	}
+	
+	public ApiResponseObject(Exception exception) {
+		this.message = exception.getMessage();
+		this.status = HttpStatus.BAD_REQUEST;
+	}
 
 	public String getMessage() {
 		return message;
