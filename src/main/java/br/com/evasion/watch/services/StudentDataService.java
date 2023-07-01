@@ -102,6 +102,7 @@ public class StudentDataService {
 					String.format("Erro ao processar dados, motivo: %s", e.getMessage()), HttpStatus.BAD_REQUEST));
 		}
 
+		LOGGER.info("[IMPORTAÇÃO DE DADOS] Importação concluida com sucesso!");
 		return new ApiResponseObject(
 				String.format("Dados processados com sucesso, registros adicionados: %d", rowCount), HttpStatus.OK);
 	}
