@@ -16,12 +16,14 @@ import br.com.evasion.watch.exceptions.EmailExistsException;
 import br.com.evasion.watch.exceptions.EwException;
 import br.com.evasion.watch.exceptions.LoginExistsException;
 import br.com.evasion.watch.exceptions.UserNotFoundException;
+import br.com.evasion.watch.exceptions.UserTokenNotFoundException;
 import br.com.evasion.watch.models.entities.Token;
 import br.com.evasion.watch.models.entities.User;
 import br.com.evasion.watch.models.enums.TokenTypeEnum;
 import br.com.evasion.watch.models.transfer.ApiResponseObject;
 import br.com.evasion.watch.models.transfer.AuthenticationApiResponseObject;
 import br.com.evasion.watch.models.transfer.AuthenticationRequest;
+import br.com.evasion.watch.models.transfer.UserObject;
 import br.com.evasion.watch.repositories.TokenRepository;
 import br.com.evasion.watch.repositories.UserRepository;
 
@@ -50,11 +52,11 @@ public class UserService {
 	}
 
 	public ApiResponseObject registerUser(User user, BindingResult bindingResult) {
-		LOGGER.info("Iniciando a criação do usuário: {}", user.getLogin());
+		LOGGER.info("[REGISTRO DE USUÁRIO] Iniciando a criação do usuário: {}", user.getLogin());
 		AuthenticationApiResponseObject response = new AuthenticationApiResponseObject();
 
 		if (bindingResult.hasErrors()) {
-			LOGGER.error("A validação do usuário encontrou os seguintes problemas:");
+			LOGGER.error("[REGISTRO DE USUÁRIO] A validação do usuário encontrou os seguintes problemas:");
 			StringBuilder errorMessage = new StringBuilder();
 			for (ObjectError error : bindingResult.getAllErrors()) {
 				LOGGER.error(error.getDefaultMessage());
@@ -135,4 +137,10 @@ public class UserService {
 	    });
 	    tokenRepository.saveAll(validUserTokens);
 	  }
+
+	public UserObject findUserObjectByToken(String token) throws UserTokenNotFoundException {
+		String jwt = token.substring(7);
+		User user = userRepository.findUserByToken(jwt).orElseThrow(() -> new UserTokenNotFoundException(jwt));
+		return new UserObject(user);
+	}
 }

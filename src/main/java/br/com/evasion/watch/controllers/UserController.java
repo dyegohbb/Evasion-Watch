@@ -34,6 +34,10 @@ public class UserController {
         return new ResponseEntity<>(response, response.getStatus());
     }
 	
+	/**
+	 * @deprecated Este método será removido na próxima versão. Pois é usado apenas para testar autenticação.
+	 */
+	@Deprecated(forRemoval = true)
 	@GetMapping("/console")
 	public ResponseEntity<ApiResponseObject> console() {
 		ApiResponseObject response = new ApiResponseObject();

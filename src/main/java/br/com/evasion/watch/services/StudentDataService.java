@@ -26,6 +26,7 @@ import br.com.evasion.watch.models.entities.User;
 import br.com.evasion.watch.models.enums.SituationEnum;
 import br.com.evasion.watch.models.enums.StudentDataExtensionType;
 import br.com.evasion.watch.models.transfer.ApiResponseObject;
+import br.com.evasion.watch.models.transfer.UserObject;
 import br.com.evasion.watch.repositories.CsvImportHistoryRepository;
 
 @Service
@@ -39,43 +40,47 @@ public class StudentDataService {
 	@Autowired
 	private CsvImportHistoryRepository importHistoryRepository;
 
-	public ApiResponseObject importStudentData(UserDetails userDetails, MultipartFile studentDataCsv) {
+	public ApiResponseObject importStudentData(String authorization, MultipartFile studentDataCsv) {
 
 		try {
-			LOGGER.info("Iniciando importação de dados");
-			User user = userService.findUserByLogin(userDetails.getUsername());
+			LOGGER.info("[IMPORTAÇÃO DE DADOS] Iniciando validações dos dados.");
+			UserObject user = userService.findUserObjectByToken(authorization);
 
 			if (!studentDataCsv.isEmpty()) {
 				String fileName = studentDataCsv.getOriginalFilename();
 
 				if (fileName != null) {
 					String fileExtension = fileName.substring(fileName.lastIndexOf(".") + 1);
-					LOGGER.info("Extensão do arquivo enviado: {}", fileExtension);
+					LOGGER.info("[IMPORTAÇÃO DE DADOS] Extensão do arquivo enviado: {}", fileExtension);
 					if (!StudentDataExtensionType.isValidExtension(fileExtension)) {
+						LOGGER.error("[IMPORTAÇÃO DE DADOS] Extensão do arquivo não suportada: {}", fileExtension);
 						throw new FileNotSupportedException(fileExtension);
 					}
 				} else {
 					throw new NoFileContentException();
 				}
 				
+				LOGGER.info("[IMPORTAÇÃO DE DADOS] Salvando histórico inicial da importação");
 				CsvImportHistory importHistory = new CsvImportHistory();
 				importHistory.setFileName(fileName);
 				importHistory.setFileSize(studentDataCsv.getSize());
 				importHistory.setSituation(SituationEnum.RUNNING);
 				importHistoryRepository.save(importHistory);
-
+				LOGGER.info("[IMPORTAÇÃO DE DADOS] Histórico inicial da importação salvo com sucesso!");
+				
 				return this.processStudentDataCsv(studentDataCsv, user, fileName, importHistory);
 			}
 			throw new NoFileContentException();
 
 		} catch (EwException e) {
-			LOGGER.error(String.format("Erro na importação de dados, motivo: %s", e.getMessage()));
+			LOGGER.error(String.format("[IMPORTAÇÃO DE DADOS] Erro na importação de dados, motivo: %s", e.getMessage()));
 			return new ApiResponseObject(e);
 		}
 
 	}
 
-	private ApiResponseObject processStudentDataCsv(MultipartFile studentDataCsv, User user, String fileName, CsvImportHistory importHistory) {
+	private ApiResponseObject processStudentDataCsv(MultipartFile studentDataCsv, UserObject user, String fileName, CsvImportHistory importHistory) {
+		LOGGER.info("[IMPORTAÇÃO DE DADOS] Iniciando processamento dos dados.");
 		CSVFormat csvFormat = CSVFormat.DEFAULT.builder().setDelimiter(";").setIgnoreEmptyLines(true)
 				.setSkipHeaderRecord(true).setHeader().build();
 		int rowCount = 0;
@@ -104,7 +109,9 @@ public class StudentDataService {
 
 	private int prepareAndSaveCsvImportHistory(MultipartFile studentDataCsv, String fileName,
 			List<StudentData> dataList, CsvImportHistory importHistory) throws EwException {
+		
 		int rowCount = dataList.size();
+		LOGGER.info("[IMPORTAÇÃO DE DADOS] Iniciando salvamento dos dados, quantidade: {}", rowCount);
 		
 		try {
 			importHistory.setRowCount(rowCount);
@@ -119,6 +126,8 @@ public class StudentDataService {
 					String.format("Erro ao salvar dados no banco de dados, motivo: %s", e.getMessage()),
 					HttpStatus.BAD_REQUEST);
 		}
+		
+		LOGGER.info("[IMPORTAÇÃO DE DADOS] Salvamento dos dados concluida com sucesso! Dados salvos: {}", rowCount);
 		return rowCount;
 	}
 

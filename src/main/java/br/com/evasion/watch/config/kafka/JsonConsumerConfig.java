@@ -16,7 +16,7 @@ import org.springframework.kafka.support.converter.JsonMessageConverter;
 public class JsonConsumerConfig {
 
 	@Bean
-	public ConsumerFactory<String, Object> jsonConsumerFactory(KafkaProperties properties) {
+	ConsumerFactory<String, Object> jsonConsumerFactory(KafkaProperties properties) {
 		var configs = new HashMap<String, Object>();
 		configs.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, properties.getBootstrapServers());
 		configs.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);

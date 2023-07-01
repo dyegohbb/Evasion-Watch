@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
@@ -22,11 +23,9 @@ public class StudentDataController {
 	private StudentDataService studentDataService;
 
 	@PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<ApiResponseObject> importStudentData(@RequestPart("file") MultipartFile studentDataCsv,
+	public ResponseEntity<ApiResponseObject> importStudentData(@RequestHeader("Authorization") String authorization, @RequestPart("file") MultipartFile studentDataCsv,
 			Authentication authentication) {
-		UserDetails user = (UserDetails) authentication.getPrincipal();
-
-		ApiResponseObject response = studentDataService.importStudentData(user, studentDataCsv);
+		ApiResponseObject response = studentDataService.importStudentData(authorization, studentDataCsv);
 		return new ResponseEntity<>(response, response.getStatus());
 	}
 

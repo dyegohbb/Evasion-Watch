@@ -2,7 +2,7 @@ package br.com.evasion.watch.config.kafka;
 
 public enum KafkaTopics {
 	
-	FULL_ANALYSIS("full-analysis");
+	FULL_ANALYSIS("full_analysis");
 
 	private String description;
 	
