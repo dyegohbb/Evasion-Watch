@@ -56,7 +56,6 @@ public class CsvImportHistory {
     private List<StudentData> studentDatas = new ArrayList<>();
 	
 	@NotNull(message = "O usuário pode ser nulo")
-	@Column(nullable = false)
 	@ManyToOne
 	@JoinColumn(name = "user_id")
 	private User user;
