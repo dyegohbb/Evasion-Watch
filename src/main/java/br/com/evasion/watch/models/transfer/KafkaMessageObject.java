@@ -18,6 +18,12 @@ public class KafkaMessageObject implements Serializable {
 		// Empty Constructor
 	}
 
+	public KafkaMessageObject(UserObject user, String metadata, TaskOperationEnum operation) {
+		this.user = user;
+		this.metadata = metadata;
+		this.operation = operation;
+	}
+
 	public UserObject getUser() {
 		return user;
 	}
