@@ -138,9 +138,12 @@ public class UserService {
 	    tokenRepository.saveAll(validUserTokens);
 	  }
 
-	public UserObject findUserObjectByToken(String token) throws UserTokenNotFoundException {
+	public User findUserByToken(String token) throws UserTokenNotFoundException {
 		String jwt = token.substring(7);
-		User user = userRepository.findUserByToken(jwt).orElseThrow(() -> new UserTokenNotFoundException(jwt));
-		return new UserObject(user);
+		return userRepository.findUserByToken(jwt).orElseThrow(() -> new UserTokenNotFoundException(jwt));
+	}
+	
+	public UserObject findUserObjectByToken(String token) throws UserTokenNotFoundException {
+		return new UserObject(findUserByToken(token));
 	}
 }

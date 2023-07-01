@@ -12,7 +12,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -26,7 +25,6 @@ import br.com.evasion.watch.models.entities.User;
 import br.com.evasion.watch.models.enums.SituationEnum;
 import br.com.evasion.watch.models.enums.StudentDataExtensionType;
 import br.com.evasion.watch.models.transfer.ApiResponseObject;
-import br.com.evasion.watch.models.transfer.UserObject;
 import br.com.evasion.watch.repositories.CsvImportHistoryRepository;
 
 @Service
@@ -44,7 +42,7 @@ public class StudentDataService {
 
 		try {
 			LOGGER.info("[IMPORTAÇÃO DE DADOS] Iniciando validações dos dados.");
-			UserObject user = userService.findUserObjectByToken(authorization);
+			User user = userService.findUserByToken(authorization);
 
 			if (!studentDataCsv.isEmpty()) {
 				String fileName = studentDataCsv.getOriginalFilename();
@@ -65,10 +63,11 @@ public class StudentDataService {
 				importHistory.setFileName(fileName);
 				importHistory.setFileSize(studentDataCsv.getSize());
 				importHistory.setSituation(SituationEnum.RUNNING);
+				importHistory.setUser(user);
 				importHistoryRepository.save(importHistory);
 				LOGGER.info("[IMPORTAÇÃO DE DADOS] Histórico inicial da importação salvo com sucesso!");
 				
-				return this.processStudentDataCsv(studentDataCsv, user, fileName, importHistory);
+				return this.processStudentDataCsv(studentDataCsv, importHistory);
 			}
 			throw new NoFileContentException();
 
@@ -79,7 +78,7 @@ public class StudentDataService {
 
 	}
 
-	private ApiResponseObject processStudentDataCsv(MultipartFile studentDataCsv, UserObject user, String fileName, CsvImportHistory importHistory) {
+	private ApiResponseObject processStudentDataCsv(MultipartFile studentDataCsv, CsvImportHistory importHistory) {
 		LOGGER.info("[IMPORTAÇÃO DE DADOS] Iniciando processamento dos dados.");
 		CSVFormat csvFormat = CSVFormat.DEFAULT.builder().setDelimiter(";").setIgnoreEmptyLines(true)
 				.setSkipHeaderRecord(true).setHeader().build();
@@ -92,7 +91,7 @@ public class StudentDataService {
 			List<StudentData> dataList = csvParser.stream().parallel()
 					.map(csvRecord -> this.prepareDatafromCSVRecord(csvRecord, headerMap)).toList();
 
-			rowCount = prepareAndSaveCsvImportHistory(studentDataCsv, fileName, dataList, importHistory);
+			rowCount = prepareAndSaveCsvImportHistory(dataList, importHistory);
 
 		} catch (EwException e) {
 			LOGGER.error("Erro ao processar dados, motivo: {}", e.getMessage());
@@ -107,8 +106,7 @@ public class StudentDataService {
 				String.format("Dados processados com sucesso, registros adicionados: %d", rowCount), HttpStatus.OK);
 	}
 
-	private int prepareAndSaveCsvImportHistory(MultipartFile studentDataCsv, String fileName,
-			List<StudentData> dataList, CsvImportHistory importHistory) throws EwException {
+	private int prepareAndSaveCsvImportHistory(List<StudentData> dataList, CsvImportHistory importHistory) throws EwException {
 		
 		int rowCount = dataList.size();
 		LOGGER.info("[IMPORTAÇÃO DE DADOS] Iniciando salvamento dos dados, quantidade: {}", rowCount);
