@@ -14,6 +14,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
@@ -52,6 +54,12 @@ public class CsvImportHistory {
 	@Column(nullable = false)
 	@OneToMany(mappedBy = "csvImportHistory", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<StudentData> studentDatas = new ArrayList<>();
+	
+	@NotNull(message = "O usuário pode ser nulo")
+	@Column(nullable = false)
+	@ManyToOne
+	@JoinColumn(name = "user_id")
+	private User user;
 	
 	public CsvImportHistory() {
 		// Empty Constructor
@@ -116,6 +124,14 @@ public class CsvImportHistory {
 
 	public void setStudentDatas(List<StudentData> studentDatas) {
 		this.studentDatas = studentDatas;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
 	}
 	
 }
