@@ -140,7 +140,7 @@ public class UserService {
 
 	public User findUserByToken(String token) throws UserTokenNotFoundException {
 		String jwt = token.substring(7);
-		return userRepository.findUserByToken(jwt).orElseThrow(() -> new UserTokenNotFoundException(jwt));
+		return tokenRepository.findUserByToken(jwt).orElseThrow(() -> new UserTokenNotFoundException(jwt));
 	}
 	
 	public UserObject findUserObjectByToken(String token) throws UserTokenNotFoundException {
