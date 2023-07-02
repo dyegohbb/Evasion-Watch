@@ -1,6 +1,7 @@
 package br.com.evasion.watch.models.entities;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import br.com.evasion.watch.models.enums.SituationEnum;
 import br.com.evasion.watch.models.enums.TaskOperationEnum;
@@ -13,7 +14,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
@@ -26,14 +26,15 @@ public class Task {
 
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
+	
+	@Column(nullable = false)
+	private String uuid;
 
 	@NotNull(message = "A operação não pode ser nula")
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private TaskOperationEnum operation;
 
-	@NotBlank(message = "O metadata não pode ser vazio")
-	@Column(nullable = false)
 	private String metadata;
 
 	@NotNull(message = "A situação não pode ser nula")
@@ -47,14 +48,25 @@ public class Task {
 
 	@Column(nullable = true)
 	private String exeptionMsg;
+	
+	private String userLogin;
 
 	public Task() {
 		// Empty Constructor
 	}
 
+	public Task(TaskOperationEnum operation, String metadata, SituationEnum situation, String userLogin) {
+		this.operation = operation;
+		this.metadata = metadata;
+		this.situation = situation;
+		this.progress = 0;
+		this.userLogin = userLogin;
+	}
+
 	@PrePersist
 	protected void onCreate() {
 		this.createdAt = LocalDateTime.now();
+		this.uuid = UUID.randomUUID().toString();
 	}
 
 	public int getId() {
@@ -113,4 +125,19 @@ public class Task {
 		this.exeptionMsg = exeptionMsg;
 	}
 
+	public String getUUID() {
+		return uuid;
+	}
+
+	public void setUUID(String uUID) {
+		uuid = uUID;
+	}
+
+	public String getUserLogin() {
+		return userLogin;
+	}
+
+	public void setUserLogin(String userLogin) {
+		this.userLogin = userLogin;
+	}
 }

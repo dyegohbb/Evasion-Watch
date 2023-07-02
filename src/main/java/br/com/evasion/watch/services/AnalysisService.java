@@ -17,13 +17,16 @@ import br.com.evasion.watch.config.kafka.KafkaTopics;
 import br.com.evasion.watch.exceptions.DuplicateScheduleException;
 import br.com.evasion.watch.exceptions.EwException;
 import br.com.evasion.watch.models.entities.ScheduledAnalysis;
+import br.com.evasion.watch.models.entities.Task;
 import br.com.evasion.watch.models.enums.RecurrenceEnum;
+import br.com.evasion.watch.models.enums.SituationEnum;
 import br.com.evasion.watch.models.enums.TaskOperationEnum;
 import br.com.evasion.watch.models.transfer.ApiResponseObject;
-import br.com.evasion.watch.models.transfer.KafkaMessageObject;
 import br.com.evasion.watch.models.transfer.ScheduledAnalysisObject;
+import br.com.evasion.watch.models.transfer.TaskObject;
 import br.com.evasion.watch.models.transfer.UserObject;
 import br.com.evasion.watch.repositories.ScheduledAnalysisRepository;
+import br.com.evasion.watch.repositories.TaskRepository;
 
 @Service
 public class AnalysisService {
@@ -38,14 +41,21 @@ public class AnalysisService {
 
 	@Autowired
 	private ScheduledAnalysisRepository scheduledRepository;
+	
+	@Autowired
+	private TaskRepository taskRepository;
 
 	public ApiResponseObject fullAnalysis(String userToken) {
 		LOGGER.info("[ANÁLISE COMPLETA] Preparando para solicitar a execução ao serviço responsável.");
 		try {
 			UserObject user = userService.findUserObjectByToken(userToken);
-			KafkaMessageObject messageObject = new KafkaMessageObject(user, "", TaskOperationEnum.FULL_ANALYSIS);
-
-			producerService.sendMessage(KafkaTopics.FULL_ANALYSIS.getDescription(), messageObject);
+			
+			Task task = new Task(TaskOperationEnum.FULL_ANALYSIS, "", SituationEnum.RUNNING, user.getLogin());
+			task.setProgress(10);
+			
+			Task taskSaved = taskRepository.save(task);
+			TaskObject taskObject = new TaskObject(taskSaved);
+			producerService.sendMessage(KafkaTopics.FULL_ANALYSIS.getDescription(), taskObject);
 		} catch (Exception e) {
 			LOGGER.error("[ANÁLISE COMPLETA] Erro ao enviar solicitação, motivo: ", e);
 			return new ApiResponseObject(e);
@@ -75,10 +85,12 @@ public class AnalysisService {
 
 	private void sendMessageAndPrepareScheduled(List<ScheduledAnalysis> scheduleList) throws EwException {
 		LOGGER.info("[ANÁLISE AGENDADA] Preparando para solicitar a execução ao serviço responsável.");
-		KafkaMessageObject messageObject = new KafkaMessageObject(new UserObject(), "",
-				TaskOperationEnum.FULL_ANALYSIS);
+		Task task = new Task(TaskOperationEnum.FULL_ANALYSIS, "", SituationEnum.RUNNING, "SCHEDULER");
+		task.setProgress(10);
 
-		producerService.sendMessage(KafkaTopics.FULL_ANALYSIS.getDescription(), messageObject);
+		Task taskSaved = taskRepository.save(task);
+		TaskObject taskObject = new TaskObject(taskSaved);
+		producerService.sendMessage(KafkaTopics.FULL_ANALYSIS.getDescription(), taskObject);
 		LOGGER.info("[ANÁLISE AGENDADA] Solicitação enviada com sucesso!");
 
 		LOGGER.info("[ANÁLISE AGENDADA] Preparando os agendamentos para a proxima execução.");

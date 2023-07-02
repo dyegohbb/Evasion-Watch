@@ -10,7 +10,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 
 import br.com.evasion.watch.exceptions.EwException;
-import br.com.evasion.watch.models.transfer.KafkaMessageObject;
+import br.com.evasion.watch.models.transfer.TaskObject;
 
 
 @Service
@@ -21,7 +21,7 @@ public class ProducerService  {
 	@Autowired
 	private KafkaTemplate<String, String> kafkaTemplate;
 
-	public void sendMessage(String topico, KafkaMessageObject messageObject) throws EwException {
+	public void sendMessage(String topico, TaskObject messageObject) throws EwException {
 		try {
 			LOGGER.info("[PRODUCER-{}] Serializando objeto para o formato StringJson.", topico);
 			ObjectWriter objectWriter = new ObjectMapper().findAndRegisterModules().writer().withDefaultPrettyPrinter();
