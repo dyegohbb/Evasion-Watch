@@ -1,10 +1,8 @@
 package br.com.evasion.watch.models.entities;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import br.com.evasion.watch.models.enums.RecurrenceEnum;
-import br.com.evasion.watch.validation.EndDateValidation;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -27,13 +25,17 @@ public class ScheduledAnalysis {
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
 	
-	@NotNull(message = "Data de inicio não pode ser nula")
+	@NotNull(message = "Dia do agendamento não pode ser nula")
 	@Column(nullable = false)
-	private LocalDate startDate;
+	private int day;
 	
-	@EndDateValidation(startDate = "startDate", message = "Data final inválida")
-	@Column(nullable = true)
-	private LocalDate endDate;
+	@NotNull(message = "Próxima execução não pode ser nula")
+	@Column(nullable = false)
+	private LocalDateTime nextExecution;
+	
+	@NotNull(message = "Próxima execução não pode ser nula")
+	@Column(nullable = false)
+	private LocalDateTime lastExecution;
 	
 	@NotNull(message = "Recorrencia não pode ser nula")
 	@Enumerated(EnumType.STRING)
@@ -65,28 +67,36 @@ public class ScheduledAnalysis {
 		this.createdAt = createdAt;
 	}
 
-	public LocalDate getStartDate() {
-		return startDate;
-	}
-
-	public void setStartDate(LocalDate startDate) {
-		this.startDate = startDate;
-	}
-
-	public LocalDate getEndDate() {
-		return endDate;
-	}
-
-	public void setEndDate(LocalDate endDate) {
-		this.endDate = endDate;
-	}
-
 	public RecurrenceEnum getRecurrence() {
 		return recurrence;
 	}
 
 	public void setRecurrence(RecurrenceEnum recurrence) {
 		this.recurrence = recurrence;
+	}
+
+	public int getDay() {
+		return day;
+	}
+
+	public void setDay(int day) {
+		this.day = day;
+	}
+
+	public LocalDateTime getNextExecution() {
+		return nextExecution;
+	}
+
+	public void setNextExecution(LocalDateTime nextExecution) {
+		this.nextExecution = nextExecution;
+	}
+
+	public LocalDateTime getLastExecution() {
+		return lastExecution;
+	}
+
+	public void setLastExecution(LocalDateTime lastExecution) {
+		this.lastExecution = lastExecution;
 	}
 	
 }

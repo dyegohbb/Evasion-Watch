@@ -13,6 +13,11 @@ public class EwException extends Exception{
 		this.httpStatus = HttpStatus.BAD_REQUEST;
 	}
 	
+	public EwException(Exception e) {
+		super(e);
+		this.httpStatus = HttpStatus.BAD_REQUEST;
+	}
+	
 	public EwException(String msg, HttpStatus status) {
 		super(msg);
 		this.httpStatus = status;
