@@ -3,7 +3,6 @@ package br.com.evasion.watch.services;
 import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.List;
-import java.util.Optional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import br.com.evasion.watch.config.kafka.KafkaTopics;
+import br.com.evasion.watch.exceptions.EwException;
 import br.com.evasion.watch.models.entities.ScheduledAnalysis;
 import br.com.evasion.watch.models.enums.TaskOperationEnum;
 import br.com.evasion.watch.models.transfer.ApiResponseObject;
@@ -51,15 +51,15 @@ public class AnalysisService {
 	public void sheduledAnalysis() {
 		LOGGER.info("[ANÁLISE AGENDADA] Buscando agendamentos previstos/atrasados pra hoje.");
 		try {
-			Optional<List<ScheduledAnalysis>> scheduleListOpt = scheduledRepository
+			List<ScheduledAnalysis> scheduleList = scheduledRepository
 					.findByNextExecution(LocalDateTime.now().withHour(3).withMinute(0).withSecond(0));
 
-			if (scheduleListOpt.isEmpty()) {
+			if (scheduleList.isEmpty()) {
 				LOGGER.info("[ANÁLISE AGENDADA] Nenhum agendamento localizado, serviço finalizado.");
 			} else {
 				LOGGER.info("[ANÁLISE AGENDADA] Encontramos agendamento para hoje.");
 
-				sendMessageAndPrepareScheduled(scheduleListOpt.get());
+				sendMessageAndPrepareScheduled(scheduleList);
 				LOGGER.info("[ANÁLISE AGENDADA] Serviço finalizado com sucesso!");
 			}
 		} catch (Exception e) {
@@ -67,16 +67,17 @@ public class AnalysisService {
 		}
 	}
 
-	private void sendMessageAndPrepareScheduled(List<ScheduledAnalysis> scheduleList) throws Exception {
+	private void sendMessageAndPrepareScheduled(List<ScheduledAnalysis> scheduleList) throws EwException {
 		LOGGER.info("[ANÁLISE AGENDADA] Preparando para solicitar a execução ao serviço responsável.");
-		KafkaMessageObject messageObject = new KafkaMessageObject(new UserObject(), "", TaskOperationEnum.FULL_ANALYSIS);
+		KafkaMessageObject messageObject = new KafkaMessageObject(new UserObject(), "",
+				TaskOperationEnum.FULL_ANALYSIS);
 
 		producerService.sendMessage(KafkaTopics.FULL_ANALYSIS.getDescription(), messageObject);
 		LOGGER.info("[ANÁLISE AGENDADA] Solicitação enviada com sucesso!");
-		
+
 		LOGGER.info("[ANÁLISE AGENDADA] Preparando os agendamentos para a proxima execução.");
 		scheduleList.forEach(this::prepareScheduled);
-		
+
 		scheduledRepository.saveAll(scheduleList);
 	}
 
@@ -84,7 +85,7 @@ public class AnalysisService {
 		schedule.setLastExecution(LocalDateTime.now().withHour(3).withMinute(0).withSecond(0));
 		int lastDayOfMonth = YearMonth.from(LocalDateTime.now()).lengthOfMonth();
 		int scheduleDay = schedule.getDay() <= lastDayOfMonth ? schedule.getDay() : lastDayOfMonth;
-		
+
 		schedule.setNextExecution(LocalDateTime.now().withDayOfMonth(scheduleDay).withHour(0).withMinute(0)
 				.withSecond(0).plusMonths(schedule.getRecurrence().getMonths()));
 	}
