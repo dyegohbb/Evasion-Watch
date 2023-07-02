@@ -17,12 +17,12 @@ import br.com.evasion.watch.exceptions.EwException;
 import br.com.evasion.watch.exceptions.LoginExistsException;
 import br.com.evasion.watch.exceptions.UserNotFoundException;
 import br.com.evasion.watch.exceptions.UserTokenNotFoundException;
-import br.com.evasion.watch.models.entities.Token;
+import br.com.evasion.watch.models.entities.UserToken;
 import br.com.evasion.watch.models.entities.User;
 import br.com.evasion.watch.models.enums.TokenTypeEnum;
 import br.com.evasion.watch.models.transfer.ApiResponseObject;
 import br.com.evasion.watch.models.transfer.AuthenticationApiResponseObject;
-import br.com.evasion.watch.models.transfer.AuthenticationRequest;
+import br.com.evasion.watch.models.transfer.AuthenticationObject;
 import br.com.evasion.watch.models.transfer.UserObject;
 import br.com.evasion.watch.repositories.TokenRepository;
 import br.com.evasion.watch.repositories.UserRepository;
@@ -102,11 +102,11 @@ public class UserService {
 	}
 
 	private void saveUserToken(User user, String jwtToken) {
-		Token token = new Token(user, jwtToken, TokenTypeEnum.BEARER, false, false);
+		UserToken token = new UserToken(user, jwtToken, TokenTypeEnum.BEARER, false, false);
 		tokenRepository.save(token);
 	}
 
-	public ApiResponseObject login(AuthenticationRequest request) {
+	public ApiResponseObject login(AuthenticationObject request) {
 
 		try {
 			authenticationManager

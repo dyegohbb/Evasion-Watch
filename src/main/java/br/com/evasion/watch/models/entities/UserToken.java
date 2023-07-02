@@ -10,32 +10,34 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
-public class Token {
+@Table(name = "user_token")
+public class UserToken {
 
 	@Id
 	@GeneratedValue
-	public Integer id;
+	private Integer id;
 
 	@Column(unique = true)
-	public String token;
+	private String token;
 
 	@Enumerated(EnumType.STRING)
-	public TokenTypeEnum tokenType = TokenTypeEnum.BEARER;
+	private TokenTypeEnum tokenType = TokenTypeEnum.BEARER;
 
-	public boolean revoked;
+	private boolean revoked;
 
-	public boolean expired;
+	private boolean expired;
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	public User user;
 
-	public Token() {
+	public UserToken() {
 	}
 
-	public Token(User user, String jwtToken, TokenTypeEnum tokenType, boolean revoked, boolean expired) {
+	public UserToken(User user, String jwtToken, TokenTypeEnum tokenType, boolean revoked, boolean expired) {
 		this.user = user;
 		this.token = jwtToken;
 		this.tokenType = tokenType;

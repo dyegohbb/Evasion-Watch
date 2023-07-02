@@ -1,12 +1,12 @@
 package br.com.evasion.watch.models.transfer;
 
-public class AuthenticationRequest {
+public class AuthenticationObject {
 
 	private String login;
 	
 	private String password;
 
-	public AuthenticationRequest() {
+	public AuthenticationObject() {
 		//EMPTY CONSTRUCTOR
 	}
 

@@ -2,6 +2,7 @@ package br.com.evasion.watch.services;
 
 import java.time.LocalDateTime;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -9,13 +10,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 
 import br.com.evasion.watch.config.kafka.KafkaTopics;
+import br.com.evasion.watch.exceptions.DuplicateScheduleException;
 import br.com.evasion.watch.exceptions.EwException;
 import br.com.evasion.watch.models.entities.ScheduledAnalysis;
+import br.com.evasion.watch.models.enums.RecurrenceEnum;
 import br.com.evasion.watch.models.enums.TaskOperationEnum;
 import br.com.evasion.watch.models.transfer.ApiResponseObject;
 import br.com.evasion.watch.models.transfer.KafkaMessageObject;
+import br.com.evasion.watch.models.transfer.ScheduledAnalysisObject;
 import br.com.evasion.watch.models.transfer.UserObject;
 import br.com.evasion.watch.repositories.ScheduledAnalysisRepository;
 
@@ -82,11 +88,65 @@ public class AnalysisService {
 	}
 
 	private void prepareScheduled(ScheduledAnalysis schedule) {
-		schedule.setLastExecution(LocalDateTime.now().withHour(3).withMinute(0).withSecond(0));
 		int lastDayOfMonth = YearMonth.from(LocalDateTime.now()).lengthOfMonth();
 		int scheduleDay = schedule.getDay() <= lastDayOfMonth ? schedule.getDay() : lastDayOfMonth;
 
 		schedule.setNextExecution(LocalDateTime.now().withDayOfMonth(scheduleDay).withHour(0).withMinute(0)
 				.withSecond(0).plusMonths(schedule.getRecurrence().getMonths()));
+	}
+
+	public ApiResponseObject schedule(ScheduledAnalysisObject request, BindingResult bindingResult) {
+		try {
+			LOGGER.info("[AGENDAR ANÁLISE] Iniciando processo de agendamento.");
+			if (bindingResult.hasErrors()) {
+				LOGGER.error("[AGENDAR ANÁLISE] Encontramos os seguintes problemas: ");
+				StringBuilder errorMessage = new StringBuilder();
+				for (ObjectError error : bindingResult.getAllErrors()) {
+					LOGGER.error(error.getDefaultMessage());
+					errorMessage.append(error.getDefaultMessage()).append("; ");
+				}
+
+				return new ApiResponseObject(errorMessage.toString(), HttpStatus.BAD_REQUEST);
+			}
+			int day = request.getDay();
+			RecurrenceEnum recurrence = request.getRecurrence();
+			if (scheduledRepository.findByDayAndRecurrence(day, recurrence).isPresent()) {
+				LOGGER.error("[AGENDAR ANÁLISE] Já existe um agendamento para esse dia[{}], com essa recurrencia[{}].",
+						day, recurrence);
+
+				return new ApiResponseObject(new DuplicateScheduleException(day, recurrence));
+			}
+			LOGGER.info("[AGENDAR ANÁLISE] Preparando dados para salvar no banco de dados.");
+			ScheduledAnalysis schedule = new ScheduledAnalysis(request);
+
+			LocalDateTime nextExecution = LocalDateTime.now().withDayOfMonth(day).withHour(0).withMinute(0)
+					.withSecond(0);
+
+			LocalDateTime now = LocalDateTime.now();
+
+			if (nextExecution.isAfter(now)) {
+				LOGGER.info("[AGENDAR ANÁLISE] O dia do agendamento é posterior à data atual, portanto a próxima execução será neste mês.");
+				schedule.setNextExecution(nextExecution);
+			} else {
+				LOGGER.info("[AGENDAR ANÁLISE] O dia do agendamento é anterior à data atual, portanto a próxima execução será no próximo mês.");
+				schedule.setNextExecution(nextExecution.plusMonths(1));
+			}
+
+			LOGGER.info("[AGENDAR ANÁLISE] Salvando agendamento no banco de dados.");
+			ScheduledAnalysis scheduleSaved = scheduledRepository.save(schedule);
+			LOGGER.info("[AGENDAR ANÁLISE] Agendamento salvo no banco de dados com sucesso!");
+			
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+			String formattedDateTime = scheduleSaved.getNextExecution().format(formatter);
+			
+			return new ApiResponseObject(
+					String.format("Agendamento criado com sucesso, dia: %d recurrencia: %s próxima execução: %s",
+							scheduleSaved.getDay(), scheduleSaved.getRecurrence().toString(), formattedDateTime),
+					HttpStatus.CREATED);
+			
+		} catch (Exception e) {
+			return new ApiResponseObject(e);
+		}
+
 	}
 }

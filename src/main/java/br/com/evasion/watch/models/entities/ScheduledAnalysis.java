@@ -3,6 +3,7 @@ package br.com.evasion.watch.models.entities;
 import java.time.LocalDateTime;
 
 import br.com.evasion.watch.models.enums.RecurrenceEnum;
+import br.com.evasion.watch.models.transfer.ScheduledAnalysisObject;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -12,10 +13,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "scheduled_analysis")
+@Table(name = "scheduled_analysis", uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"day", "recurrence"})})
 public class ScheduledAnalysis {
 
 	@Id
@@ -33,10 +36,6 @@ public class ScheduledAnalysis {
 	@Column(nullable = false)
 	private LocalDateTime nextExecution;
 	
-	@NotNull(message = "Próxima execução não pode ser nula")
-	@Column(nullable = false)
-	private LocalDateTime lastExecution;
-	
 	@NotNull(message = "Recorrencia não pode ser nula")
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
@@ -44,6 +43,11 @@ public class ScheduledAnalysis {
 	
 	public ScheduledAnalysis() {
 		// Empty Constructor
+	}
+
+	public ScheduledAnalysis(ScheduledAnalysisObject request) {
+		this.day = request.getDay();
+		this.recurrence = request.getRecurrence();
 	}
 
 	@PrePersist
@@ -90,13 +94,4 @@ public class ScheduledAnalysis {
 	public void setNextExecution(LocalDateTime nextExecution) {
 		this.nextExecution = nextExecution;
 	}
-
-	public LocalDateTime getLastExecution() {
-		return lastExecution;
-	}
-
-	public void setLastExecution(LocalDateTime lastExecution) {
-		this.lastExecution = lastExecution;
-	}
-	
 }
