@@ -23,7 +23,7 @@ public class TaskObject implements Serializable{
 
 	private int progress = 0;
 
-	private String exeptionMsg;
+	private String exceptionMsg;
 
 	public TaskObject() {
 		// Empty Constructor
@@ -36,7 +36,7 @@ public class TaskObject implements Serializable{
 		this.metadata = task.getMetadata();
 		this.situation = task.getSituation();
 		this.progress = task.getProgress();
-		this.exeptionMsg = task.getExeptionMsg();
+		this.exceptionMsg = task.getExeptionMsg();
 	}
 
 	public LocalDateTime getCreatedAt() {
@@ -79,12 +79,12 @@ public class TaskObject implements Serializable{
 		this.progress = progress;
 	}
 
-	public String getExeptionMsg() {
-		return exeptionMsg;
+	public String getExceptionMsg() {
+		return exceptionMsg;
 	}
 
-	public void setExeptionMsg(String exeptionMsg) {
-		this.exeptionMsg = exeptionMsg;
+	public void setExceptionMsg(String exeptionMsg) {
+		this.exceptionMsg = exeptionMsg;
 	}
 
 	public static long getSerialversionuid() {

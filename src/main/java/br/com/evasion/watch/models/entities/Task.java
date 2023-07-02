@@ -47,7 +47,7 @@ public class Task {
 	private int progress = 0;
 
 	@Column(nullable = true)
-	private String exeptionMsg;
+	private String exceptionMsg;
 	
 	private String userLogin;
 
@@ -117,12 +117,12 @@ public class Task {
 		this.progress = progress;
 	}
 
-	public String getExeptionMsg() {
-		return exeptionMsg;
+	public String getExceptionMsg() {
+		return exceptionMsg;
 	}
 
-	public void setExeptionMsg(String exeptionMsg) {
-		this.exeptionMsg = exeptionMsg;
+	public void setExceptionMsg(String exeptionMsg) {
+		this.exceptionMsg = exeptionMsg;
 	}
 
 	public String getUUID() {
