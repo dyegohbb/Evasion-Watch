@@ -18,7 +18,6 @@ public class ScheduleAnalysis implements Runnable{
 	private AnalysisService analysisService;
 	
 	@Override
-	@PostConstruct
     @Scheduled(cron = "0 0 3 * * ?")
     public void run() {
 		LOGGER.info("[ANÁLISE AGENDADA] Iniciando serviço de análise agendada.");
