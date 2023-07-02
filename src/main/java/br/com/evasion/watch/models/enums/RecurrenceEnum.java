@@ -1,7 +1,7 @@
 package br.com.evasion.watch.models.enums;
 
 public enum RecurrenceEnum {
-	MENSAL(1), SEMESTRAL(6), ANUAL(12);
+	MONTHLY(1), WEEKLY(6), YEARLY(12);
 	
 	int months;
 
