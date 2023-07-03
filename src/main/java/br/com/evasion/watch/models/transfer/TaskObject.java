@@ -36,7 +36,7 @@ public class TaskObject implements Serializable{
 		this.metadata = task.getMetadata();
 		this.situation = task.getSituation();
 		this.progress = task.getProgress();
-		this.exceptionMsg = task.getExeptionMsg();
+		this.exceptionMsg = task.getExceptionMsg();
 	}
 
 	public LocalDateTime getCreatedAt() {

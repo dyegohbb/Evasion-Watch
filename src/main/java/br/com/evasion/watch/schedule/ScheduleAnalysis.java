@@ -7,7 +7,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import br.com.evasion.watch.services.AnalysisService;
-import jakarta.annotation.PostConstruct;
 
 @Component
 public class ScheduleAnalysis implements Runnable{

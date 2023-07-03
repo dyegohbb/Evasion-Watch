@@ -91,7 +91,7 @@ public class UserService {
 
 			} catch (EwException e) {
 				LOGGER.error("Erro ao criar usuário: ", e);
-				return new ApiResponseObject(e);
+				return new ApiResponseObject(new EwException("Não foi possível criar usuário com essas credenciais", HttpStatus.BAD_REQUEST));
 			} catch (Exception e) {
 				LOGGER.error("Erro ao criar usuário: ", e);
 				return new ApiResponseObject(new EwException());
