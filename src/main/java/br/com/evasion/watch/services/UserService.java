@@ -85,6 +85,7 @@ public class UserService {
 				saveUserToken(savedUser, jwtToken);
 				response.setAccessToken(jwtToken);
 				response.setRefreshToken(refreshToken);
+				response.setNameOfUser(user.getName());
 
 				response.setMessage("Usuário cadastrado com sucesso!");
 				response.setStatus(HttpStatus.CREATED);
@@ -120,7 +121,7 @@ public class UserService {
 			    saveUserToken(user, jwtToken);
 			    
 			String message = "Login efetuado com sucesso!";
-			return new AuthenticationApiResponseObject(message, HttpStatus.OK, jwtToken, refreshToken);
+			return new AuthenticationApiResponseObject(message, HttpStatus.OK, jwtToken, refreshToken, user.getName());
 		} catch (Exception e) {
 			LOGGER.error("Erro ao efetuar login de usuário: ", e);
 			return new ApiResponseObject(new EwException());
