@@ -6,6 +6,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class AuthenticationApiResponseObject extends ApiResponseObject {
 	
+	@JsonProperty("name")
+	private String nameOfUser;
+	
 	@JsonProperty("access_token")
 	private String accessToken;
 	
@@ -16,10 +19,11 @@ public class AuthenticationApiResponseObject extends ApiResponseObject {
 		//Empty constructor
 	}
 	
-	public AuthenticationApiResponseObject(String message, HttpStatus status, String accessToken, String refreshToken) {
+	public AuthenticationApiResponseObject(String message, HttpStatus status, String accessToken, String refreshToken, String nameOfUser) {
 		super(message, status);
 		this.accessToken = accessToken;
 		this.refreshToken = refreshToken;
+		this.nameOfUser = nameOfUser;
 	}
 
 	public String getAccessToken() {
@@ -36,5 +40,13 @@ public class AuthenticationApiResponseObject extends ApiResponseObject {
 
 	public void setRefreshToken(String refreshToken) {
 		this.refreshToken = refreshToken;
+	}
+	
+	public String getNameOfUser() {
+		return nameOfUser;
+	}
+
+	public void setNameOfUser(String nameOfUser) {
+		this.nameOfUser = nameOfUser;
 	}
 }
