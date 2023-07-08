@@ -40,7 +40,7 @@ public class AnalysisController {
 	/**
 	 * @deprecated Este método será removido na próxima versão. Pois a análise completa será usada apenas com agendamento.
 	 */
-	@Deprecated(forRemoval = true)
+	@Deprecated
 	@PostMapping(value = "/full")
 	public ResponseEntity<ApiResponseObject> importStudentData(@RequestHeader("Authorization") String authorization, Authentication authentication) {
 		ApiResponseObject response = analysisService.fullAnalysis(authorization);
@@ -94,5 +94,11 @@ public class AnalysisController {
 		
         return new ResponseEntity<>(objList, HttpStatus.OK);
     }
+	
+	@PostMapping("/ia/train")
+    public ResponseEntity<ApiResponseObject> iaTrain(@RequestHeader("Authorization") String authorization) {
+		ApiResponseObject response = analysisService.iaTrain(authorization);
+        return new ResponseEntity<>(response, response.getStatus());
+	}
 
 }

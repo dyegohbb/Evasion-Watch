@@ -231,4 +231,23 @@ public class AnalysisService {
 
 		return historyObj;
 	}
+
+	public ApiResponseObject iaTrain(String userToken) {
+		LOGGER.info("[TREINO DE IA] Preparando para solicitar a execução ao serviço responsável.");
+		try {
+			UserObject user = userService.findUserObjectByToken(userToken);
+
+			Task task = new Task(TaskOperationEnum.IA_TRAIN, "", SituationEnum.RUNNING, user.getLogin());
+			task.setProgress(10);
+
+			Task taskSaved = taskRepository.save(task);
+			TaskObject taskObject = new TaskObject(taskSaved);
+			producerService.sendMessage(KafkaTopics.IA_TRAIN.getDescription(), taskObject);
+		} catch (Exception e) {
+			LOGGER.error("[TREINO DE IA] Erro ao enviar solicitação, motivo: ", e);
+			return new ApiResponseObject(e);
+		}
+		LOGGER.info("[TREINO DE IA] Solicitação enviada com sucesso!");
+		return new ApiResponseObject("Solicitação enviada com sucesso, aguarde a finalização.", HttpStatus.CREATED);
+	}
 }
