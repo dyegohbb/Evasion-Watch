@@ -4,7 +4,6 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,17 +16,21 @@ import org.springframework.validation.ObjectError;
 import br.com.evasion.watch.config.kafka.KafkaTopics;
 import br.com.evasion.watch.exceptions.DuplicateScheduleException;
 import br.com.evasion.watch.exceptions.EwException;
+import br.com.evasion.watch.models.entities.AnalysisResultHistory;
 import br.com.evasion.watch.models.entities.ScheduledAnalysis;
 import br.com.evasion.watch.models.entities.Task;
 import br.com.evasion.watch.models.enums.RecurrenceEnum;
 import br.com.evasion.watch.models.enums.SituationEnum;
 import br.com.evasion.watch.models.enums.TaskOperationEnum;
+import br.com.evasion.watch.models.transfer.AnalysisResultHistoryObject;
 import br.com.evasion.watch.models.transfer.ApiResponseObject;
 import br.com.evasion.watch.models.transfer.ScheduledAnalysisLightObject;
 import br.com.evasion.watch.models.transfer.ScheduledAnalysisObject;
 import br.com.evasion.watch.models.transfer.TaskObject;
 import br.com.evasion.watch.models.transfer.UserObject;
+import br.com.evasion.watch.repositories.AnalysisResultHistoryRepository;
 import br.com.evasion.watch.repositories.ScheduledAnalysisRepository;
+import br.com.evasion.watch.repositories.StudentDataRepository;
 import br.com.evasion.watch.repositories.TaskRepository;
 
 @Service
@@ -43,18 +46,25 @@ public class AnalysisService {
 
 	@Autowired
 	private ScheduledAnalysisRepository scheduledRepository;
-	
+
 	@Autowired
 	private TaskRepository taskRepository;
+
+	@Autowired
+	private AnalysisResultHistoryRepository analysisResultHistoryRepository;
+	
+	@Autowired
+	private StudentDataRepository studentDataRepository;
+	
 
 	public ApiResponseObject fullAnalysis(String userToken) {
 		LOGGER.info("[ANÁLISE COMPLETA] Preparando para solicitar a execução ao serviço responsável.");
 		try {
 			UserObject user = userService.findUserObjectByToken(userToken);
-			
+
 			Task task = new Task(TaskOperationEnum.FULL_ANALYSIS, "", SituationEnum.RUNNING, user.getLogin());
 			task.setProgress(10);
-			
+
 			Task taskSaved = taskRepository.save(task);
 			TaskObject taskObject = new TaskObject(taskSaved);
 			producerService.sendMessage(KafkaTopics.FULL_ANALYSIS.getDescription(), taskObject);
@@ -139,25 +149,27 @@ public class AnalysisService {
 			LocalDateTime now = LocalDateTime.now();
 
 			if (nextExecution.isAfter(now)) {
-				LOGGER.info("[AGENDAR ANÁLISE] O dia do agendamento é posterior à data atual, portanto a próxima execução será neste mês.");
+				LOGGER.info(
+						"[AGENDAR ANÁLISE] O dia do agendamento é posterior à data atual, portanto a próxima execução será neste mês.");
 				schedule.setNextExecution(nextExecution);
 			} else {
-				LOGGER.info("[AGENDAR ANÁLISE] O dia do agendamento é anterior à data atual, portanto a próxima execução será no próximo mês.");
+				LOGGER.info(
+						"[AGENDAR ANÁLISE] O dia do agendamento é anterior à data atual, portanto a próxima execução será no próximo mês.");
 				schedule.setNextExecution(nextExecution.plusMonths(1));
 			}
 
 			LOGGER.info("[AGENDAR ANÁLISE] Salvando agendamento no banco de dados.");
 			ScheduledAnalysis scheduleSaved = scheduledRepository.save(schedule);
 			LOGGER.info("[AGENDAR ANÁLISE] Agendamento salvo no banco de dados com sucesso!");
-			
+
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 			String formattedDateTime = scheduleSaved.getNextExecution().format(formatter);
-			
+
 			return new ApiResponseObject(
 					String.format("Agendamento criado com sucesso, dia: %d recurrencia: %s próxima execução: %s",
 							scheduleSaved.getDay(), scheduleSaved.getRecurrence().toString(), formattedDateTime),
 					HttpStatus.CREATED);
-			
+
 		} catch (Exception e) {
 			return new ApiResponseObject(e);
 		}
@@ -166,7 +178,7 @@ public class AnalysisService {
 
 	public List<ScheduledAnalysisObject> listSchedule() {
 		List<ScheduledAnalysis> scheduledAnalysisList = this.scheduledRepository.findAllWithDeleted();
-		
+
 		return scheduledAnalysisList.stream().map(ScheduledAnalysisObject::new).toList();
 	}
 
@@ -178,5 +190,37 @@ public class AnalysisService {
 			return new ApiResponseObject("Erro ao deletar schedule", HttpStatus.BAD_REQUEST);
 		}
 		return new ApiResponseObject("Schedule deletado com sucesso!", HttpStatus.OK);
+	}
+
+	public ApiResponseObject restaureSchedule(String uuid) {
+		try {
+			this.scheduledRepository.restaureByUUID(uuid);
+		} catch (Exception e) {
+			LOGGER.error("Erro ao restaurar schedule", e);
+			return new ApiResponseObject("Erro ao restaurar schedule", HttpStatus.BAD_REQUEST);
+		}
+		return new ApiResponseObject("Schedule restaurado com sucesso!", HttpStatus.OK);
+	}
+
+	public List<AnalysisResultHistoryObject> listStudentAnalisysHistory() {
+		List<AnalysisResultHistory> historyList = analysisResultHistoryRepository.findAll();
+		
+		
+		List<AnalysisResultHistoryObject> list = historyList.stream().map(this::getStudentNameAndMapObject).toList();
+		return list;
+	}
+	
+	public AnalysisResultHistoryObject getStudentNameAndMapObject(AnalysisResultHistory history){
+		AnalysisResultHistoryObject historyObj = new AnalysisResultHistoryObject();
+		
+		try {
+			String studentName = this.studentDataRepository.findNameByStudentId(history.getStudentID()).orElseThrow(() -> new EwException("Erro ao encontrar nome do aluno", HttpStatus.BAD_REQUEST));
+			historyObj = new AnalysisResultHistoryObject(history, studentName);
+			return historyObj;
+		} catch (Exception e) {
+			LOGGER.info(e.getMessage());
+		}
+		
+		return historyObj;
 	}
 }

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import br.com.evasion.watch.models.transfer.AnalysisResultHistoryObject;
 import br.com.evasion.watch.models.transfer.ApiResponseObject;
 import br.com.evasion.watch.models.transfer.ScheduledAnalysisLightObject;
 import br.com.evasion.watch.models.transfer.ScheduledAnalysisObject;
@@ -77,5 +78,21 @@ public class AnalysisController {
         return new ResponseEntity<>(response, response.getStatus());
 	}
 	
+	@PostMapping("/schedule/restaure/{uuid}")
+    public ResponseEntity<ApiResponseObject> restaureSchedule(@PathVariable String uuid) {
+		ApiResponseObject response = analysisService.restaureSchedule(uuid);
+        return new ResponseEntity<>(response, response.getStatus());
+	}
+	
+	@GetMapping("/student/history")
+    public ResponseEntity<List<AnalysisResultHistoryObject>> listStudentAnalisysHistory() {
+		List<AnalysisResultHistoryObject> objList = analysisService.listStudentAnalisysHistory();
+		
+		if(objList.isEmpty()) {
+			new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		}
+		
+        return new ResponseEntity<>(objList, HttpStatus.OK);
+    }
 
 }
