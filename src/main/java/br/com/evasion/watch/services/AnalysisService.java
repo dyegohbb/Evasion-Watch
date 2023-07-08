@@ -206,8 +206,7 @@ public class AnalysisService {
 	public List<AnalysisResultHistoryObject> listStudentAnalisysHistory() {
 		List<AnalysisResultHistory> historyList = analysisResultHistoryRepository.findAllWithEvadedTrue();
 
-		List<AnalysisResultHistoryObject> list = historyList.stream().map(this::getStudentNameAndMapObject).toList();
-		return list;
+		return historyList.stream().map(this::getStudentNameAndMapObject).toList();
 	}
 
 	public AnalysisResultHistoryObject getStudentNameAndMapObject(AnalysisResultHistory history) {
