@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,10 +54,9 @@ public class AnalysisService {
 
 	@Autowired
 	private AnalysisResultHistoryRepository analysisResultHistoryRepository;
-	
+
 	@Autowired
 	private StudentDataRepository studentDataRepository;
-	
 
 	public ApiResponseObject fullAnalysis(String userToken) {
 		LOGGER.info("[ANÁLISE COMPLETA] Preparando para solicitar a execução ao serviço responsável.");
@@ -203,24 +204,32 @@ public class AnalysisService {
 	}
 
 	public List<AnalysisResultHistoryObject> listStudentAnalisysHistory() {
-		List<AnalysisResultHistory> historyList = analysisResultHistoryRepository.findAll();
-		
-		
+		List<AnalysisResultHistory> historyList = analysisResultHistoryRepository.findAllWithEvadedTrue();
+
 		List<AnalysisResultHistoryObject> list = historyList.stream().map(this::getStudentNameAndMapObject).toList();
 		return list;
 	}
-	
-	public AnalysisResultHistoryObject getStudentNameAndMapObject(AnalysisResultHistory history){
+
+	public AnalysisResultHistoryObject getStudentNameAndMapObject(AnalysisResultHistory history) {
 		AnalysisResultHistoryObject historyObj = new AnalysisResultHistoryObject();
-		
+
 		try {
-			String studentName = this.studentDataRepository.findNameByStudentId(history.getStudentID()).orElseThrow(() -> new EwException("Erro ao encontrar nome do aluno", HttpStatus.BAD_REQUEST));
+			String studentName = this.studentDataRepository.findNameByStudentId(history.getStudentID())
+					.orElseThrow(() -> new EwException("Erro ao encontrar nome do aluno", HttpStatus.BAD_REQUEST));
+			String padrao = "\\d+\\w+ - ([A-Za-z]+(?: [A-Za-z]+)+)";
+	        Pattern pattern = Pattern.compile(padrao);
+	        Matcher matcher = pattern.matcher(studentName);
+
+	        if (matcher.find()) {
+	        	studentName = matcher.group(1);
+	        }
+
 			historyObj = new AnalysisResultHistoryObject(history, studentName);
 			return historyObj;
 		} catch (Exception e) {
 			LOGGER.info(e.getMessage());
 		}
-		
+
 		return historyObj;
 	}
 }
