@@ -18,6 +18,8 @@ public class ScheduledAnalysisObject{
 	private LocalDateTime nextExecution;
 	
 	private RecurrenceEnum recurrence;
+	
+	private boolean deleted;
 
 	public ScheduledAnalysisObject() {
 	}
@@ -28,6 +30,7 @@ public class ScheduledAnalysisObject{
 		this.day = scheduled.getDay();
 		this.nextExecution = scheduled.getNextExecution();
 		this.recurrence = scheduled.getRecurrence();
+		this.deleted = scheduled.isDeleted();
 	}
 
 	public String getUuid() {
@@ -72,6 +75,14 @@ public class ScheduledAnalysisObject{
 
 	public static long getSerialversionuid() {
 		return serialVersionUID;
+	}
+
+	public boolean isDeleted() {
+		return deleted;
+	}
+
+	public void setDeleted(boolean deleted) {
+		this.deleted = deleted;
 	}
 	
 }

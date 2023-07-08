@@ -165,8 +165,18 @@ public class AnalysisService {
 	}
 
 	public List<ScheduledAnalysisObject> listSchedule() {
-		List<ScheduledAnalysis> scheduledAnalysisList = this.scheduledRepository.findAllWithoutDeleted();
+		List<ScheduledAnalysis> scheduledAnalysisList = this.scheduledRepository.findAllWithDeleted();
 		
-		return scheduledAnalysisList.stream().map(ScheduledAnalysisObject::new).collect(Collectors.toList());
+		return scheduledAnalysisList.stream().map(ScheduledAnalysisObject::new).toList();
+	}
+
+	public ApiResponseObject deleteSchedule(String uuid) {
+		try {
+			this.scheduledRepository.deleteByUUID(uuid);
+		} catch (Exception e) {
+			LOGGER.error("Erro ao deletar schedule", e);
+			return new ApiResponseObject("Erro ao deletar schedule", HttpStatus.BAD_REQUEST);
+		}
+		return new ApiResponseObject("Schedule deletado com sucesso!", HttpStatus.OK);
 	}
 }
