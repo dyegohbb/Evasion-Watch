@@ -12,10 +12,13 @@ import br.com.evasion.watch.models.enums.RecurrenceEnum;
 
 public interface ScheduledAnalysisRepository extends JpaRepository<ScheduledAnalysis, Integer>{
 
-	@Query("SELECT sa FROM ScheduledAnalysis sa WHERE sa.nextExecution < :date")
+	@Query("SELECT sa FROM ScheduledAnalysis sa WHERE sa.nextExecution < :date and sa.deleted = false")
 	List<ScheduledAnalysis> findByNextExecution(LocalDateTime date);
 	
-	@Query("SELECT sa FROM ScheduledAnalysis sa WHERE sa.day = :day AND sa.recurrence = :recurrence")
+	@Query("SELECT sa FROM ScheduledAnalysis sa WHERE sa.day = :day AND sa.recurrence = :recurrence and sa.deleted = false")
 	Optional<ScheduledAnalysis> findByDayAndRecurrence(int day, RecurrenceEnum recurrence);
+
+	@Query("SELECT sa FROM ScheduledAnalysis sa WHERE sa.deleted = false order by sa.nextExecution")
+	List<ScheduledAnalysis> findAllWithoutDeleted();
 
 }

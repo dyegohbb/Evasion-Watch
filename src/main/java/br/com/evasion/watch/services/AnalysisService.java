@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,7 @@ import br.com.evasion.watch.models.enums.RecurrenceEnum;
 import br.com.evasion.watch.models.enums.SituationEnum;
 import br.com.evasion.watch.models.enums.TaskOperationEnum;
 import br.com.evasion.watch.models.transfer.ApiResponseObject;
+import br.com.evasion.watch.models.transfer.ScheduledAnalysisLightObject;
 import br.com.evasion.watch.models.transfer.ScheduledAnalysisObject;
 import br.com.evasion.watch.models.transfer.TaskObject;
 import br.com.evasion.watch.models.transfer.UserObject;
@@ -107,7 +109,7 @@ public class AnalysisService {
 				.withSecond(0).plusMonths(schedule.getRecurrence().getMonths()));
 	}
 
-	public ApiResponseObject schedule(ScheduledAnalysisObject request, BindingResult bindingResult) {
+	public ApiResponseObject schedule(ScheduledAnalysisLightObject request, BindingResult bindingResult) {
 		try {
 			LOGGER.info("[AGENDAR ANÁLISE] Iniciando processo de agendamento.");
 			if (bindingResult.hasErrors()) {
@@ -160,5 +162,11 @@ public class AnalysisService {
 			return new ApiResponseObject(e);
 		}
 
+	}
+
+	public List<ScheduledAnalysisObject> listSchedule() {
+		List<ScheduledAnalysis> scheduledAnalysisList = this.scheduledRepository.findAllWithoutDeleted();
+		
+		return scheduledAnalysisList.stream().map(ScheduledAnalysisObject::new).collect(Collectors.toList());
 	}
 }

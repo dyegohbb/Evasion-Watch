@@ -1,9 +1,10 @@
 package br.com.evasion.watch.models.entities;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import br.com.evasion.watch.models.enums.RecurrenceEnum;
-import br.com.evasion.watch.models.transfer.ScheduledAnalysisObject;
+import br.com.evasion.watch.models.transfer.ScheduledAnalysisLightObject;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -24,6 +25,9 @@ public class ScheduledAnalysis {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private int id;
+	
+	@Column(nullable = false)
+	private String uuid;
 
 	@Column(nullable = false)
 	private LocalDateTime createdAt;
@@ -41,11 +45,14 @@ public class ScheduledAnalysis {
 	@Column(nullable = false)
 	private RecurrenceEnum recurrence;
 	
+	@Column(nullable = false, columnDefinition = "TINYINT")
+	private boolean deleted = false;
+	
 	public ScheduledAnalysis() {
 		// Empty Constructor
 	}
 
-	public ScheduledAnalysis(ScheduledAnalysisObject request) {
+	public ScheduledAnalysis(ScheduledAnalysisLightObject request) {
 		this.day = request.getDay();
 		this.recurrence = request.getRecurrence();
 	}
@@ -53,6 +60,7 @@ public class ScheduledAnalysis {
 	@PrePersist
 	protected void onCreate() {
 		this.createdAt = LocalDateTime.now();
+		this.setUuid(UUID.randomUUID().toString());
 	}
 
 	public int getId() {
@@ -93,5 +101,13 @@ public class ScheduledAnalysis {
 
 	public void setNextExecution(LocalDateTime nextExecution) {
 		this.nextExecution = nextExecution;
+	}
+
+	public String getUuid() {
+		return uuid;
+	}
+
+	public void setUuid(String uuid) {
+		this.uuid = uuid;
 	}
 }

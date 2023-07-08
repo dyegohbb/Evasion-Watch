@@ -4,9 +4,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +16,8 @@ import org.springframework.web.multipart.MultipartFile;
 import br.com.evasion.watch.models.transfer.ApiResponseObject;
 import br.com.evasion.watch.services.StudentDataService;
 
+@CrossOrigin(maxAge = 3600, allowedHeaders = { "Requestor-Type",
+"Authorization" }, exposedHeaders = {"X-Get-Header"}, originPatterns = {"http://localhost:4200"}, methods = {RequestMethod.GET, RequestMethod.POST})
 @RestController
 @RequestMapping("/student/data")
 public class StudentDataController {
