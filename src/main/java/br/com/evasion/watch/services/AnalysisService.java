@@ -21,6 +21,7 @@ import br.com.evasion.watch.exceptions.EwException;
 import br.com.evasion.watch.models.entities.AnalysisResultHistory;
 import br.com.evasion.watch.models.entities.ScheduledAnalysis;
 import br.com.evasion.watch.models.entities.Task;
+import br.com.evasion.watch.models.entities.TrainingHistory;
 import br.com.evasion.watch.models.enums.RecurrenceEnum;
 import br.com.evasion.watch.models.enums.SituationEnum;
 import br.com.evasion.watch.models.enums.TaskOperationEnum;
@@ -29,11 +30,13 @@ import br.com.evasion.watch.models.transfer.ApiResponseObject;
 import br.com.evasion.watch.models.transfer.ScheduledAnalysisLightObject;
 import br.com.evasion.watch.models.transfer.ScheduledAnalysisObject;
 import br.com.evasion.watch.models.transfer.TaskObject;
+import br.com.evasion.watch.models.transfer.TrainingHistoryObject;
 import br.com.evasion.watch.models.transfer.UserObject;
 import br.com.evasion.watch.repositories.AnalysisResultHistoryRepository;
 import br.com.evasion.watch.repositories.ScheduledAnalysisRepository;
 import br.com.evasion.watch.repositories.StudentDataRepository;
 import br.com.evasion.watch.repositories.TaskRepository;
+import br.com.evasion.watch.repositories.TrainingHistoryRepository;
 
 @Service
 public class AnalysisService {
@@ -57,6 +60,9 @@ public class AnalysisService {
 
 	@Autowired
 	private StudentDataRepository studentDataRepository;
+	
+	@Autowired
+	private TrainingHistoryRepository trainingHistoryRepository;
 
 	public ApiResponseObject fullAnalysis(String userToken) {
 		LOGGER.info("[ANÁLISE COMPLETA] Preparando para solicitar a execução ao serviço responsável.");
@@ -249,5 +255,16 @@ public class AnalysisService {
 		}
 		LOGGER.info("[TREINO DE IA] Solicitação enviada com sucesso!");
 		return new ApiResponseObject("Solicitação enviada com sucesso, aguarde a finalização.", HttpStatus.CREATED);
+	}
+
+	public TrainingHistoryObject getLastTrainResult() {
+		TrainingHistoryObject obj = null;
+		List<TrainingHistory> historyList = this.trainingHistoryRepository.getTrainingHistoryOrderByDate();
+		
+		if(!historyList.isEmpty()) {
+			obj = new TrainingHistoryObject(historyList.get(0));
+		}
+		
+		return obj;
 	}
 }

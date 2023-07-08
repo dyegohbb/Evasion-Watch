@@ -25,6 +25,7 @@ import br.com.evasion.watch.models.transfer.AnalysisResultHistoryObject;
 import br.com.evasion.watch.models.transfer.ApiResponseObject;
 import br.com.evasion.watch.models.transfer.ScheduledAnalysisLightObject;
 import br.com.evasion.watch.models.transfer.ScheduledAnalysisObject;
+import br.com.evasion.watch.models.transfer.TrainingHistoryObject;
 import br.com.evasion.watch.services.AnalysisService;
 import jakarta.validation.Valid;
 
@@ -99,6 +100,15 @@ public class AnalysisController {
     public ResponseEntity<ApiResponseObject> iaTrain(@RequestHeader("Authorization") String authorization) {
 		ApiResponseObject response = analysisService.iaTrain(authorization);
         return new ResponseEntity<>(response, response.getStatus());
+	}
+	
+	@GetMapping("/ia/train/result")
+    public ResponseEntity<TrainingHistoryObject> getLastTrainResult() {
+		TrainingHistoryObject response = analysisService.getLastTrainResult();
+		if(response != null) {
+			return new ResponseEntity<>(response, HttpStatus.OK);
+		}
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
 
 }

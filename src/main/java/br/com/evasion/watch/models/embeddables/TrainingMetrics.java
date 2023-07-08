@@ -1,81 +1,65 @@
 package br.com.evasion.watch.models.embeddables;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import jakarta.validation.constraints.NotNull;
 
 @Embeddable
 public class TrainingMetrics {
 
-	@NotNull
-    private int accuracy;
+    private double accuracy;
 	
-	@NotNull
-    private int f1Score;
+    private double f1Score;
 	
-	@NotNull
-    private int recall;
+    private double recall;
 	
-	@NotNull
-    private int precisionValue;
+    private double kappa;
 	
-	@NotNull
-    private int kappa;
+    private double modelScore;
 	
-	@NotNull
-    private int modelScore;
-	
-	@NotNull
+    @Column(columnDefinition = "TEXT")
     private String featureImportances;
 
 	public TrainingMetrics() {
 		// Empty Constructor
 	}
 
-	public int getAccuracy() {
+	public double getAccuracy() {
 		return accuracy;
 	}
 
-	public void setAccuracy(int accuracy) {
+	public void setAccuracy(double accuracy) {
 		this.accuracy = accuracy;
 	}
 
-	public int getF1Score() {
+	public double getF1Score() {
 		return f1Score;
 	}
 
-	public void setF1Score(int f1Score) {
+	public void setF1Score(double f1Score) {
 		this.f1Score = f1Score;
 	}
 
-	public int getRecall() {
+	public double getRecall() {
 		return recall;
 	}
 
-	public void setRecall(int recall) {
+	public void setRecall(double recall) {
 		this.recall = recall;
 	}
 
-	public int getPrecisionValue() {
-		return precisionValue;
-	}
-
-	public void setPrecisionValue(int precisionValue) {
-		this.precisionValue = precisionValue;
-	}
-
-	public int getKappa() {
+	public double getKappa() {
 		return kappa;
 	}
 
-	public void setKappa(int kappa) {
+	public void setKappa(double kappa) {
 		this.kappa = kappa;
 	}
 
-	public int getModelScore() {
+	public double getModelScore() {
 		return modelScore;
 	}
 
-	public void setModelScore(int modelScore) {
+	public void setModelScore(double modelScore) {
 		this.modelScore = modelScore;
 	}
 
