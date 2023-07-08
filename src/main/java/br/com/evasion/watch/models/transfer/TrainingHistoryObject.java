@@ -1,6 +1,8 @@
 package br.com.evasion.watch.models.transfer;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 
 import br.com.evasion.watch.models.entities.TrainingHistory;
@@ -27,12 +29,18 @@ public class TrainingHistoryObject implements Serializable {
 
 	public TrainingHistoryObject(TrainingHistory history) {
 		this.createdAt = history.getCreatedAt();
-		this.accuracy = Math.round(history.getMetrics().getAccuracy() * 100.0) / 100.0;
-		this.f1Score = Math.round(history.getMetrics().getF1Score() * 100.0) / 100.0;
-		this.recall = Math.round(history.getMetrics().getRecall() * 100.0) / 100.0;
-		this.kappa = Math.round(history.getMetrics().getKappa() * 100.0) / 100.0;
-		this.modelScore = Math.round(history.getMetrics().getModelScore() * 100.0) / 100.0;
+		this.accuracy = roundToFourDecimalPlaces(history.getMetrics().getAccuracy());
+		this.f1Score = roundToFourDecimalPlaces(history.getMetrics().getF1Score());
+		this.recall = roundToFourDecimalPlaces(history.getMetrics().getRecall());
+		this.kappa = roundToFourDecimalPlaces(history.getMetrics().getKappa());
+		this.modelScore = roundToFourDecimalPlaces(history.getMetrics().getModelScore());
 	}
+	
+	private double roundToFourDecimalPlaces(double value) {
+        BigDecimal bd = BigDecimal.valueOf(value);
+        bd = bd.setScale(4, RoundingMode.HALF_UP);
+        return bd.doubleValue();
+    }
 
 	public LocalDateTime getCreatedAt() {
 		return createdAt;
