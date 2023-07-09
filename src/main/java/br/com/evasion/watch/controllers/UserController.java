@@ -17,8 +17,9 @@ import br.com.evasion.watch.models.transfer.AuthenticationObject;
 import br.com.evasion.watch.services.UserService;
 import jakarta.validation.Valid;
 
-@CrossOrigin(maxAge = 3600, allowedHeaders = { "Requestor-Type",
-		"Authorization" }, exposedHeaders = {"X-Get-Header"}, originPatterns = {"http://localhost:4200"}, methods = {RequestMethod.GET, RequestMethod.POST})
+@CrossOrigin(maxAge = 3600, allowedHeaders = { "Requestor-Type", "Authorization" }, exposedHeaders = {
+		"X-Get-Header" }, originPatterns = {
+				"*" }, methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE })
 @RestController
 @RequestMapping("/user")
 public class UserController {

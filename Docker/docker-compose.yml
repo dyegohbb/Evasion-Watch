@@ -1,0 +1,98 @@
+version: '3.9'
+
+services:
+  evasion-watch:
+    image: dyegohbb/evasion-watch:1.0.0
+    ports:
+      - 8081:8081
+    networks:
+      - evasion-network
+    depends_on:
+      - mariadb
+    environment:
+      - SERVER_ADDRESS=evasion-watch
+      - SERVER_PORT=8081
+      - DB_HOST=mariadb
+      - DB_PORT=3306
+      - DB_NAME=evasionwatch
+      - DB_USERNAME=root
+      - DB_PASSWORD=QweBHU*
+      - KAFKA_HOST=kafka:9092
+      - SPRING_KAFKA_BOOTSTRAPSERVERS=kafka:9092
+
+  mariadb:
+    image: mariadb:latest
+    ports:
+      - 3306:3306
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    networks:
+      - evasion-network
+    environment:
+      - MYSQL_ROOT_PASSWORD=QweBHU*
+      - MYSQL_DATABASE=evasionwatch
+
+  kafdrop:
+    image: obsidiandynamics/kafdrop:latest
+    links:
+      - kafka
+    ports:
+      - 9000:9000
+    networks:
+      - evasion-network
+    depends_on:
+      - kafka
+    environment:
+      - KAFKA_BROKERCONNECT=kafka:9092
+
+  kafka:
+    image: wurstmeister/kafka:latest
+    ports:
+      - 9092:9092
+    volumes:
+      - kafka-data:/kafka/data
+    networks:
+      - evasion-network
+    depends_on:
+      - zookeeper
+    environment:
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=PLAINTEXT:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
+      - KAFKA_AUTO_CREATE_TOPICS_ENABLE=true
+      - KAFKA_AUTO_OFFSET_RESET=earliest
+      - KAFKA_ZOOKEEPER_CONNECT=zookeeper:2181
+      - KAFKA_LISTENERS=PLAINTEXT://:9092
+
+  zookeeper:
+    image: wurstmeister/zookeeper:latest
+    ports:
+      - 2181:2181
+    volumes:
+      - zookeeper-data:/zookeeper/data
+      - zookeeper-logs:/zookeeper/logs
+    networks:
+      - evasion-network
+    environment:
+      - ZOOKEEPER_CLIENT_PORT=2181
+      - ZOOKEEPER_TICK_TIME= 2000
+
+  evasion-webapp:
+    image: dyegohbb/evasion-webapp:1.0.0
+    ports:
+      - 80:80
+    networks:
+      - evasion-network
+    volumes:
+      - /home/dyegohbb/docker/Docker-webapp/docker/dist/evasion-web-app:/usr/share/nginx/html
+
+networks:
+  evasion-network:
+    driver: bridge
+
+volumes:
+  mariadb-data:
+  kafka-data:
+  zookeeper-data:
+  zookeeper-logs:

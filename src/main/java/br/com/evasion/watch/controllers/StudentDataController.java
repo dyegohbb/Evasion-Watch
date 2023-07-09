@@ -16,8 +16,9 @@ import org.springframework.web.multipart.MultipartFile;
 import br.com.evasion.watch.models.transfer.ApiResponseObject;
 import br.com.evasion.watch.services.StudentDataService;
 
-@CrossOrigin(maxAge = 3600, allowedHeaders = { "Requestor-Type",
-"Authorization" }, exposedHeaders = {"X-Get-Header"}, originPatterns = {"http://localhost:4200"}, methods = {RequestMethod.GET, RequestMethod.POST})
+@CrossOrigin(maxAge = 3600, allowedHeaders = { "Requestor-Type", "Authorization" }, exposedHeaders = {
+		"X-Get-Header" }, originPatterns = {
+				"*" }, methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE })
 @RestController
 @RequestMapping("/student/data")
 public class StudentDataController {
@@ -26,8 +27,8 @@ public class StudentDataController {
 	private StudentDataService studentDataService;
 
 	@PostMapping(value = "/import", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<ApiResponseObject> importStudentData(@RequestHeader("Authorization") String authorization, @RequestPart("file") MultipartFile studentDataCsv,
-			Authentication authentication) {
+	public ResponseEntity<ApiResponseObject> importStudentData(@RequestHeader("Authorization") String authorization,
+			@RequestPart("file") MultipartFile studentDataCsv, Authentication authentication) {
 		ApiResponseObject response = studentDataService.importStudentData(authorization, studentDataCsv);
 		return new ResponseEntity<>(response, response.getStatus());
 	}

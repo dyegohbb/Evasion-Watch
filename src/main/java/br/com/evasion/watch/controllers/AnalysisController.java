@@ -29,83 +29,87 @@ import br.com.evasion.watch.models.transfer.TrainingHistoryObject;
 import br.com.evasion.watch.services.AnalysisService;
 import jakarta.validation.Valid;
 
-@CrossOrigin(maxAge = 3600, allowedHeaders = { "Requestor-Type",
-"Authorization" }, exposedHeaders = {"X-Get-Header"}, originPatterns = {"http://localhost:4200"}, methods = {RequestMethod.GET, RequestMethod.POST})
+@CrossOrigin(maxAge = 3600, allowedHeaders = { "Requestor-Type", "Authorization" }, exposedHeaders = {
+		"X-Get-Header" }, originPatterns = {
+				"*" }, methods = { RequestMethod.GET, RequestMethod.POST, RequestMethod.DELETE })
 @RestController
 @RequestMapping("/analysis")
 public class AnalysisController {
-	
+
 	@Autowired
 	private AnalysisService analysisService;
-	
+
 	/**
-	 * @deprecated Este método será removido na próxima versão. Pois a análise completa será usada apenas com agendamento.
+	 * @deprecated Este método será removido na próxima versão. Pois a análise
+	 *             completa será usada apenas com agendamento.
 	 */
 	@Deprecated
 	@PostMapping(value = "/full")
-	public ResponseEntity<ApiResponseObject> importStudentData(@RequestHeader("Authorization") String authorization, Authentication authentication) {
+	public ResponseEntity<ApiResponseObject> importStudentData(@RequestHeader("Authorization") String authorization,
+			Authentication authentication) {
 		ApiResponseObject response = analysisService.fullAnalysis(authorization);
 		return new ResponseEntity<>(response, response.getStatus());
 	}
-	
+
 	@PostMapping(value = "/custom", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-	public ResponseEntity<ApiResponseObject> importStudentData(@RequestHeader("Authorization") String authorization, @RequestPart("file") MultipartFile studentDataCsv,
-			Authentication authentication) {
+	public ResponseEntity<ApiResponseObject> importStudentData(@RequestHeader("Authorization") String authorization,
+			@RequestPart("file") MultipartFile studentDataCsv, Authentication authentication) {
 //		ApiResponseObject response = studentDataService.importStudentData(authorization, studentDataCsv);
 		ApiResponseObject response = new ApiResponseObject();
 		return new ResponseEntity<>(response, response.getStatus());
 	}
-	
+
 	@PostMapping("/schedule")
-    public ResponseEntity<ApiResponseObject> schedule(@RequestBody @Valid ScheduledAnalysisLightObject request,  BindingResult bindingResult) {
+	public ResponseEntity<ApiResponseObject> schedule(@RequestBody @Valid ScheduledAnalysisLightObject request,
+			BindingResult bindingResult) {
 		ApiResponseObject response = analysisService.schedule(request, bindingResult);
-        return new ResponseEntity<>(response, response.getStatus());
-    }
-	
+		return new ResponseEntity<>(response, response.getStatus());
+	}
+
 	@GetMapping("/schedule/list")
-    public ResponseEntity<List<ScheduledAnalysisObject>> listSchedule() {
+	public ResponseEntity<List<ScheduledAnalysisObject>> listSchedule() {
 		List<ScheduledAnalysisObject> objList = analysisService.listSchedule();
-		
-		if(objList.isEmpty()) {
+
+		if (objList.isEmpty()) {
 			new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
-		
-        return new ResponseEntity<>(objList, HttpStatus.OK);
-    }
-	
+
+		return new ResponseEntity<>(objList, HttpStatus.OK);
+	}
+
 	@DeleteMapping("/schedule/delete/{uuid}")
-    public ResponseEntity<ApiResponseObject> deleteSchedule(@PathVariable String uuid) {
+	public ResponseEntity<ApiResponseObject> deleteSchedule(@PathVariable String uuid) {
 		ApiResponseObject response = analysisService.deleteSchedule(uuid);
-        return new ResponseEntity<>(response, response.getStatus());
+		return new ResponseEntity<>(response, response.getStatus());
 	}
-	
+
 	@PostMapping("/schedule/restaure/{uuid}")
-    public ResponseEntity<ApiResponseObject> restaureSchedule(@PathVariable String uuid) {
+	public ResponseEntity<ApiResponseObject> restaureSchedule(@PathVariable String uuid) {
 		ApiResponseObject response = analysisService.restaureSchedule(uuid);
-        return new ResponseEntity<>(response, response.getStatus());
+		return new ResponseEntity<>(response, response.getStatus());
 	}
-	
+
 	@GetMapping("/student/history")
-    public ResponseEntity<List<AnalysisResultHistoryObject>> listStudentAnalisysHistory() {
+	public ResponseEntity<List<AnalysisResultHistoryObject>> listStudentAnalisysHistory() {
 		List<AnalysisResultHistoryObject> objList = analysisService.listStudentAnalisysHistory();
-		
-		if(objList.isEmpty()) {
+
+		if (objList.isEmpty()) {
 			new ResponseEntity<>(HttpStatus.NO_CONTENT);
 		}
-		
-        return new ResponseEntity<>(objList, HttpStatus.OK);
-    }
-	
-	@PostMapping("/ia/train")
-    public ResponseEntity<ApiResponseObject> iaTrain(@RequestHeader("Authorization") String authorization) {
-		ApiResponseObject response = analysisService.iaTrain(authorization);
-        return new ResponseEntity<>(response, response.getStatus());
+
+		return new ResponseEntity<>(objList, HttpStatus.OK);
 	}
-	
+
+	@PostMapping("/ia/train")
+	public ResponseEntity<ApiResponseObject> iaTrain(@RequestHeader("Authorization") String authorization) {
+		ApiResponseObject response = analysisService.iaTrain(authorization);
+		return new ResponseEntity<>(response, response.getStatus());
+	}
+
 	@GetMapping("/ia/train/result")
-    public ResponseEntity<TrainingHistoryObject> getLastTrainResult() {
+	public ResponseEntity<TrainingHistoryObject> getLastTrainResult() {
 		TrainingHistoryObject response = analysisService.getLastTrainResult();
-		if(response != null) {
+		if (response != null) {
 			return new ResponseEntity<>(response, HttpStatus.OK);
 		}
 		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
