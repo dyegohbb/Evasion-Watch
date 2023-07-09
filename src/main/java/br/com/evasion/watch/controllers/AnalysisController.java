@@ -39,15 +39,10 @@ public class AnalysisController {
 	@Autowired
 	private AnalysisService analysisService;
 
-	/**
-	 * @deprecated Este método será removido na próxima versão. Pois a análise
-	 *             completa será usada apenas com agendamento.
-	 */
-	@Deprecated
-	@PostMapping(value = "/full")
+	@PostMapping(value = "/fast")
 	public ResponseEntity<ApiResponseObject> importStudentData(@RequestHeader("Authorization") String authorization,
 			Authentication authentication) {
-		ApiResponseObject response = analysisService.fullAnalysis(authorization);
+		ApiResponseObject response = analysisService.fastAnalysis(authorization);
 		return new ResponseEntity<>(response, response.getStatus());
 	}
 

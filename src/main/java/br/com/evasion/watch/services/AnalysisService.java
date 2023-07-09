@@ -64,22 +64,22 @@ public class AnalysisService {
 	@Autowired
 	private TrainingHistoryRepository trainingHistoryRepository;
 
-	public ApiResponseObject fullAnalysis(String userToken) {
-		LOGGER.info("[ANÁLISE COMPLETA] Preparando para solicitar a execução ao serviço responsável.");
+	public ApiResponseObject fastAnalysis(String userToken) {
+		LOGGER.info("[ANÁLISE RÁPIDA] Preparando para solicitar a execução ao serviço responsável.");
 		try {
 			UserObject user = userService.findUserObjectByToken(userToken);
 
-			Task task = new Task(TaskOperationEnum.FULL_ANALYSIS, "", SituationEnum.RUNNING, user.getLogin());
+			Task task = new Task(TaskOperationEnum.FAST_ANALYSIS, "", SituationEnum.RUNNING, user.getLogin());
 			task.setProgress(10);
 
 			Task taskSaved = taskRepository.save(task);
 			TaskObject taskObject = new TaskObject(taskSaved);
-			producerService.sendMessage(KafkaTopics.FULL_ANALYSIS.getDescription(), taskObject);
+			producerService.sendMessage(KafkaTopics.FAST_ANALYSIS.getDescription(), taskObject);
 		} catch (Exception e) {
-			LOGGER.error("[ANÁLISE COMPLETA] Erro ao enviar solicitação, motivo: ", e);
+			LOGGER.error("[ANÁLISE RÁPIDA] Erro ao enviar solicitação, motivo: ", e);
 			return new ApiResponseObject(e);
 		}
-		LOGGER.info("[ANÁLISE COMPLETA] Solicitação enviada com sucesso!");
+		LOGGER.info("[ANÁLISE RÁPIDA] Solicitação enviada com sucesso!");
 		return new ApiResponseObject("Solicitação enviada com sucesso, aguarde a finalização.", HttpStatus.CREATED);
 	}
 
