@@ -1,5 +1,8 @@
 package br.com.evasion.watch.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -8,13 +11,21 @@ import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 public class CorsConfig {
+	
+	private static final Logger LOGGER = LoggerFactory.getLogger(CorsConfig.class);
+	
+	@Value("${application.evasion.webapp.origin}")
+	private String allowedOrigin;
     @Bean
     CorsFilter corsFilter() {
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
 
-        config.addAllowedOrigin("http://localhost:8080");
-        config.addAllowedOrigin("http://localhost:4200");
+        config.addAllowedOrigin(allowedOrigin);
+        LOGGER.warn("-------------------");
+        LOGGER.warn("ALLOWED ORIGIN:");
+        LOGGER.warn(allowedOrigin);
+        LOGGER.warn("-------------------");
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
         config.setAllowCredentials(true);

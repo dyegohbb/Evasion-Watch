@@ -13,5 +13,10 @@
     "name": "application.security.jwt.refresh-token.expiration",
     "type": "java.lang.String",
     "description": "Tempo de expiração do refresh token JWT em milisegundos"
+  },
+  {
+    "name": "application.evasion.webapp.origin",
+    "type": "java.lang.String",
+    "description": "Origem da aplicação web para o CORS"
   }
 ]}

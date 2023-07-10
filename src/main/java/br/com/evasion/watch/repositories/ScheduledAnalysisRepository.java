@@ -7,13 +7,11 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import br.com.evasion.watch.models.entities.ScheduledAnalysis;
 import br.com.evasion.watch.models.enums.RecurrenceEnum;
 
-@Repository
 public interface ScheduledAnalysisRepository extends JpaRepository<ScheduledAnalysis, Integer>{
 
 	@Query("SELECT sa FROM ScheduledAnalysis sa WHERE sa.nextExecution < :date and sa.deleted = false")
